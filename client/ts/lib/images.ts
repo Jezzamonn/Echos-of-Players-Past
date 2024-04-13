@@ -1,4 +1,3 @@
-import { rejects } from "assert";
 
 export const images: {[key: string]: ImageInfo} = {};
 
@@ -25,7 +24,6 @@ export function loadImage({name, path, extension = 'png'} : {name: string, path:
         images[name] = {
             loaded: false,
             image: undefined,
-            loadPromise: promise,
         };
 
         const image = new Image();
@@ -39,6 +37,7 @@ export function loadImage({name, path, extension = 'png'} : {name: string, path:
         }
         image.src = imagePath;
     });
+    images[name].loadPromise = promise;
     return promise;
 }
 

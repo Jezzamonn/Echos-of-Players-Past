@@ -623,16 +623,16 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   Game: () => (/* binding */ Game)
 /* harmony export */ });
 /* harmony import */ var _constants__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../constants */ "./ts/constants.ts");
-/* harmony import */ var _entity_player__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./entity/player */ "./ts/game/entity/player.ts");
-/* harmony import */ var _lib_aseprite__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../lib/aseprite */ "./ts/lib/aseprite.ts");
-/* harmony import */ var _lib_keys__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../lib/keys */ "./ts/lib/keys.ts");
-/* harmony import */ var _lib_sounds__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../lib/sounds */ "./ts/lib/sounds.ts");
+/* harmony import */ var _lib_aseprite__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../lib/aseprite */ "./ts/lib/aseprite.ts");
+/* harmony import */ var _lib_keys__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../lib/keys */ "./ts/lib/keys.ts");
+/* harmony import */ var _lib_sounds__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../lib/sounds */ "./ts/lib/sounds.ts");
+/* harmony import */ var _background__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./background */ "./ts/game/background.ts");
 /* harmony import */ var _camera__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./camera */ "./ts/game/camera.ts");
-/* harmony import */ var _level__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./level */ "./ts/game/level.ts");
-/* harmony import */ var _levels__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./levels */ "./ts/game/levels.ts");
-/* harmony import */ var _sfx__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./sfx */ "./ts/game/sfx.ts");
-/* harmony import */ var _tile_tiles__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./tile/tiles */ "./ts/game/tile/tiles.ts");
-/* harmony import */ var _background__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./background */ "./ts/game/background.ts");
+/* harmony import */ var _entity_player__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./entity/player */ "./ts/game/entity/player.ts");
+/* harmony import */ var _level__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./level */ "./ts/game/level.ts");
+/* harmony import */ var _levels__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./levels */ "./ts/game/levels.ts");
+/* harmony import */ var _sfx__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./sfx */ "./ts/game/sfx.ts");
+/* harmony import */ var _tile_tiles__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./tile/tiles */ "./ts/game/tile/tiles.ts");
 /* harmony import */ var _touch_keys__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./touch-keys */ "./ts/game/touch-keys.ts");
 
 
@@ -651,7 +651,7 @@ class Game {
         this.scale = 1;
         this.levelIndex = 0;
         this.showingTitle = true;
-        this.nullKeys = new _lib_keys__WEBPACK_IMPORTED_MODULE_3__.NullKeys();
+        this.nullKeys = new _lib_keys__WEBPACK_IMPORTED_MODULE_2__.NullKeys();
         const canvas = document.querySelector(canvasSelector);
         if (!canvas) {
             throw new Error(`Could not find canvas with selector ${canvasSelector}`);
@@ -659,12 +659,12 @@ class Game {
         const context = canvas.getContext('2d');
         this.canvas = canvas;
         this.context = context;
-        this.keys = new _lib_keys__WEBPACK_IMPORTED_MODULE_3__.ComboKeys(new _lib_keys__WEBPACK_IMPORTED_MODULE_3__.KeyboardKeys(), new _touch_keys__WEBPACK_IMPORTED_MODULE_11__.TouchKeys());
-        _lib_sounds__WEBPACK_IMPORTED_MODULE_4__.Sounds.loadMuteState();
+        this.keys = new _lib_keys__WEBPACK_IMPORTED_MODULE_2__.ComboKeys(new _lib_keys__WEBPACK_IMPORTED_MODULE_2__.KeyboardKeys(), new _touch_keys__WEBPACK_IMPORTED_MODULE_11__.TouchKeys());
+        _lib_sounds__WEBPACK_IMPORTED_MODULE_3__.Sounds.loadMuteState();
     }
     start() {
         this.keys.setUp();
-        _lib_aseprite__WEBPACK_IMPORTED_MODULE_2__.Aseprite.disableSmoothing(this.context);
+        _lib_aseprite__WEBPACK_IMPORTED_MODULE_1__.Aseprite.disableSmoothing(this.context);
         this.resize();
         window.addEventListener('resize', () => this.resize());
         // Whenever any touch event happens, try to enter fullscreen.
@@ -673,15 +673,15 @@ class Game {
         this.startLevel(0);
     }
     nextLevel() {
-        this.startLevel((this.levelIndex + 1) % _levels__WEBPACK_IMPORTED_MODULE_7__.LEVELS.length);
+        this.startLevel((this.levelIndex + 1) % _levels__WEBPACK_IMPORTED_MODULE_8__.LEVELS.length);
     }
     prevLevel() {
-        this.startLevel((this.levelIndex + _levels__WEBPACK_IMPORTED_MODULE_7__.LEVELS.length - 1) % _levels__WEBPACK_IMPORTED_MODULE_7__.LEVELS.length);
+        this.startLevel((this.levelIndex + _levels__WEBPACK_IMPORTED_MODULE_8__.LEVELS.length - 1) % _levels__WEBPACK_IMPORTED_MODULE_8__.LEVELS.length);
     }
     startLevel(levelIndex) {
         this.levelIndex = levelIndex;
-        const levelInfo = _levels__WEBPACK_IMPORTED_MODULE_7__.LEVELS[this.levelIndex];
-        const level = new _level__WEBPACK_IMPORTED_MODULE_6__.Level(this, levelInfo);
+        const levelInfo = _levels__WEBPACK_IMPORTED_MODULE_8__.LEVELS[this.levelIndex];
+        const level = new _level__WEBPACK_IMPORTED_MODULE_7__.Level(this, levelInfo);
         level.initFromImage();
         this.curLevel = level;
         // if (levelInfo.song) {
@@ -712,7 +712,7 @@ class Game {
     handleInput() {
         if (this.keys.wasPressedThisFrame('KeyM')) {
             // Mute
-            _lib_sounds__WEBPACK_IMPORTED_MODULE_4__.Sounds.toggleMute();
+            _lib_sounds__WEBPACK_IMPORTED_MODULE_3__.Sounds.toggleMute();
         }
         // Debug:
         if (this.keys.wasPressedThisFrame('Comma')) {
@@ -765,7 +765,7 @@ class Game {
         this.canvas.style.width = `${windowWidth}px`;
         this.canvas.style.height = `${windowHeight}px`;
         // Need to call this again when the canvas size changes.
-        _lib_aseprite__WEBPACK_IMPORTED_MODULE_2__.Aseprite.disableSmoothing(this.context);
+        _lib_aseprite__WEBPACK_IMPORTED_MODULE_1__.Aseprite.disableSmoothing(this.context);
         // Set HTML element size
         document.body.style.setProperty('--pageWidth', `${windowWidth}px`);
         document.body.style.setProperty('--pageHeight', `${windowHeight}px`);
@@ -782,12 +782,12 @@ class Game {
     }
     static async preload() {
         await Promise.all([
-            _levels__WEBPACK_IMPORTED_MODULE_7__.Levels.preload(),
-            _tile_tiles__WEBPACK_IMPORTED_MODULE_9__.Tiles.preload(),
-            _entity_player__WEBPACK_IMPORTED_MODULE_1__.Player.preload(),
-            _background__WEBPACK_IMPORTED_MODULE_10__.Background.preload(),
+            _levels__WEBPACK_IMPORTED_MODULE_8__.Levels.preload(),
+            _tile_tiles__WEBPACK_IMPORTED_MODULE_10__.Tiles.preload(),
+            _entity_player__WEBPACK_IMPORTED_MODULE_6__.Player.preload(),
+            _background__WEBPACK_IMPORTED_MODULE_4__.Background.preload(),
         ]);
-        _sfx__WEBPACK_IMPORTED_MODULE_8__.SFX.preload();
+        _sfx__WEBPACK_IMPORTED_MODULE_9__.SFX.preload();
     }
 }
 
@@ -1997,7 +1997,6 @@ function loadImage({ name, path, extension = 'png' }) {
         images[name] = {
             loaded: false,
             image: undefined,
-            loadPromise: promise,
         };
         const image = new Image();
         image.onload = () => {
@@ -2010,6 +2009,7 @@ function loadImage({ name, path, extension = 'png' }) {
         };
         image.src = imagePath;
     });
+    images[name].loadPromise = promise;
     return promise;
 }
 const Images = {
