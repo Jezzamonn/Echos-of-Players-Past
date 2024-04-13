@@ -5,6 +5,7 @@ import { RegularKeys } from "../../lib/keys";
 import { Level } from "../level";
 import { KeyRecorder } from "../recordreplay/key-recorder";
 import { ObjectTile } from "../tile/object-layer";
+import { PhysicTile } from "../tile/tiles";
 import { Entity } from "./entity";
 
 const imageName = 'characters';
@@ -17,6 +18,7 @@ export class Player extends Entity {
 
     keyRecorder: KeyRecorder | undefined;
     keys: RegularKeys;
+    dead = false;
 
     onFirstInput: (() => void) | undefined;
 
@@ -36,7 +38,11 @@ export class Player extends Entity {
         let animName = 'idle';
         let loop = true;
 
-        if (this.dx !== 0 || this.dy !== 0) {
+        if (this.dead) {
+            animName = 'die';
+            loop = false;
+        }
+        else if (this.dx !== 0 || this.dy !== 0) {
             animName = 'run';
         }
 
@@ -69,6 +75,9 @@ export class Player extends Entity {
         this.animCount += dt;
 
         // TODO: Maybe checking what animation frame we're add and playing a sound effect (e.g. if it's a footstep frame.)
+        if (this.dead) {
+            return;
+        }
 
         const left = this.keys.anyIsPressed(LEFT_KEYS);
         const right = this.keys.anyIsPressed(RIGHT_KEYS);
@@ -108,11 +117,21 @@ export class Player extends Entity {
             this.level.win();
         }
 
+        // Check for dying X_X
+        if (this.isOnTile(this.level.tiles, PhysicTile.Spikes) || this.isOnTile(this.level.tiles, PhysicTile.Hole)) {
+            this.die();
+        }
+
         this.keyRecorder?.update(this.keys);
 
         if (left || right || up || down || action) {
             this.onFirstInput?.();
         }
+    }
+
+    die() {
+        this.animCount = 0;
+        this.dead = true;
     }
 
     static async preload() {

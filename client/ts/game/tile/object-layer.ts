@@ -1,12 +1,18 @@
 import { Point } from "../../common";
 import { TILE_SIZE } from "../../constants";
-import { ButtonColor, Level } from "../level";
+import { Level } from "../level";
 import { TileLayer } from "./tile-layer";
 
 export enum ObjectTile {
     Empty = 0,
     Spawn = 1,
     Goal = 2,
+
+    // Not actually used in the tile set but calculated from the things below.
+    Button = 3,
+    Spikes = 4,
+    Bridge = 5,
+
     RedButton = 10,
     RedSpikes = 11,
     RedBridge = 12,
@@ -16,6 +22,27 @@ export enum ObjectTile {
     BlueButton = 30,
     BlueSpikes = 31,
     BlueBridge = 32,
+}
+
+export enum ButtonColor {
+    Red = 1,
+    Yellow = 2,
+    Blue = 3,
+}
+
+export function getButtonColor(tile: ObjectTile): ButtonColor | undefined {
+    if (tile == ObjectTile.Empty) {
+        return undefined;
+    }
+    return Math.floor(tile / 10) as ButtonColor;
+}
+
+// Only relevant for colored tiles.
+export function getNormalTileType(tile: ObjectTile): ObjectTile {
+    if (tile >= ObjectTile.RedButton) {
+        return (tile % 10) + ObjectTile.Button;
+    }
+    return tile;
 }
 
 // Position of the tile in the tileset.
@@ -46,13 +73,8 @@ export class ObjectLayer extends TileLayer<ObjectTile> {
 
         const pos2 = {x: tilePos.x, y: tilePos.y }
 
-        if (Math.floor(tile / 10) == 1 && level.buttonState[ButtonColor.Red]) {
-            pos2.y += 1;
-        }
-        if (Math.floor(tile / 10) == 2 && level.buttonState[ButtonColor.Yellow]) {
-            pos2.y += 1;
-        }
-        if (Math.floor(tile / 10) == 3 && level.buttonState[ButtonColor.Blue]) {
+        const buttonColor = getButtonColor(tile);
+        if (buttonColor != undefined && level.buttonState[buttonColor]) {
             pos2.y += 1;
         }
 

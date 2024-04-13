@@ -10,14 +10,8 @@ import { LevelInfo } from "./levels";
 import { KeyHistory } from "./recordreplay/key-history";
 import { KeyReplayer } from "./recordreplay/key-replayer";
 import { BaseTile } from "./tile/base-layer";
-import { ObjectTile } from "./tile/object-layer";
+import { ButtonColor, ObjectTile } from "./tile/object-layer";
 import { Tiles } from "./tile/tiles";
-
-export enum ButtonColor {
-    Red = 'red',
-    Yellow = 'yellow',
-    Blue = 'blue',
-}
 
 // Contains everything in one level, including the tiles and the entities.
 export class Level {
@@ -28,7 +22,7 @@ export class Level {
 
     camera: FocusCamera = new FocusCamera();
 
-    tiles: Tiles = new Tiles(0, 0);
+    tiles: Tiles = new Tiles(0, 0, this);
 
     start: Point = { x: 0, y: 0 };
 
@@ -51,7 +45,7 @@ export class Level {
         const image = Images.images[this.levelInfo.name].image!;
         this.image = image;
         this.entities = [];
-        this.tiles = new Tiles(image.width, image.height);
+        this.tiles = new Tiles(image.width, image.height, this);
 
         // Draw the image to a canvas to get the pixels.
         const canvas = document.createElement('canvas');
@@ -198,7 +192,7 @@ export class Level {
     render(context: CanvasRenderingContext2D) {
         this.camera.applyTransform(context);
 
-        this.tiles.render(context, this);
+        this.tiles.render(context);
 
         for (const entity of this.entities) {
             entity.render(context);

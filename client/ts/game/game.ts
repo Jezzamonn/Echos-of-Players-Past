@@ -134,6 +134,10 @@ export class Game {
         if (this.keys.wasPressedThisFrame('Period')) {
             this.nextLevel();
         }
+        if (this.keys.wasPressedThisFrame('KeyN')) {
+            this.win();
+        }
+
         if (this.keys.anyWasPressedThisFrame(RESTART_KEYS)) {
             this.startLevel(this.levelIndex);
         }

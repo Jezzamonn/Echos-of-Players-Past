@@ -351,7 +351,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _lib_aseprite__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../lib/aseprite */ "./ts/lib/aseprite.ts");
 /* harmony import */ var _recordreplay_key_recorder__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../recordreplay/key-recorder */ "./ts/game/recordreplay/key-recorder.ts");
 /* harmony import */ var _tile_object_layer__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../tile/object-layer */ "./ts/game/tile/object-layer.ts");
-/* harmony import */ var _entity__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./entity */ "./ts/game/entity/entity.ts");
+/* harmony import */ var _tile_tiles__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../tile/tiles */ "./ts/game/tile/tiles.ts");
+/* harmony import */ var _entity__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./entity */ "./ts/game/entity/entity.ts");
+
 
 
 
@@ -359,11 +361,12 @@ __webpack_require__.r(__webpack_exports__);
 
 
 const imageName = 'characters';
-class Player extends _entity__WEBPACK_IMPORTED_MODULE_5__.Entity {
+class Player extends _entity__WEBPACK_IMPORTED_MODULE_6__.Entity {
     constructor(level, keys, recordInput = true) {
         super(level);
         this.runSpeed = 1 * _constants__WEBPACK_IMPORTED_MODULE_1__.PHYSICS_SCALE * _constants__WEBPACK_IMPORTED_MODULE_1__.FPS;
         this.facingDir = _common__WEBPACK_IMPORTED_MODULE_0__.FacingDir.Right;
+        this.dead = false;
         // TODO: Set w and h
         this.w = (0,_constants__WEBPACK_IMPORTED_MODULE_1__.physFromPx)(5);
         this.h = (0,_constants__WEBPACK_IMPORTED_MODULE_1__.physFromPx)(5);
@@ -375,7 +378,11 @@ class Player extends _entity__WEBPACK_IMPORTED_MODULE_5__.Entity {
     getAnimationName() {
         let animName = 'idle';
         let loop = true;
-        if (this.dx !== 0 || this.dy !== 0) {
+        if (this.dead) {
+            animName = 'die';
+            loop = false;
+        }
+        else if (this.dx !== 0 || this.dy !== 0) {
             animName = 'run';
         }
         return { animName, loop };
@@ -401,6 +408,9 @@ class Player extends _entity__WEBPACK_IMPORTED_MODULE_5__.Entity {
     update(dt) {
         this.animCount += dt;
         // TODO: Maybe checking what animation frame we're add and playing a sound effect (e.g. if it's a footstep frame.)
+        if (this.dead) {
+            return;
+        }
         const left = this.keys.anyIsPressed(_constants__WEBPACK_IMPORTED_MODULE_1__.LEFT_KEYS);
         const right = this.keys.anyIsPressed(_constants__WEBPACK_IMPORTED_MODULE_1__.RIGHT_KEYS);
         const up = this.keys.anyIsPressed(_constants__WEBPACK_IMPORTED_MODULE_1__.UP_KEYS);
@@ -434,10 +444,18 @@ class Player extends _entity__WEBPACK_IMPORTED_MODULE_5__.Entity {
         if (this.isOnTile(this.level.tiles.objectLayer, _tile_object_layer__WEBPACK_IMPORTED_MODULE_4__.ObjectTile.Goal)) {
             this.level.win();
         }
+        // Check for dying X_X
+        if (this.isOnTile(this.level.tiles, _tile_tiles__WEBPACK_IMPORTED_MODULE_5__.PhysicTile.Spikes) || this.isOnTile(this.level.tiles, _tile_tiles__WEBPACK_IMPORTED_MODULE_5__.PhysicTile.Hole)) {
+            this.die();
+        }
         this.keyRecorder?.update(this.keys);
         if (left || right || up || down || action) {
             this.onFirstInput?.();
         }
+    }
+    die() {
+        this.animCount = 0;
+        this.dead = true;
     }
     static async preload() {
         await _lib_aseprite__WEBPACK_IMPORTED_MODULE_2__.Aseprite.loadImage({ name: imageName, basePath: 'sprites' });
@@ -565,6 +583,9 @@ class Game {
         if (this.keys.wasPressedThisFrame('Period')) {
             this.nextLevel();
         }
+        if (this.keys.wasPressedThisFrame('KeyN')) {
+            this.win();
+        }
         if (this.keys.anyWasPressedThisFrame(_constants__WEBPACK_IMPORTED_MODULE_0__.RESTART_KEYS)) {
             this.startLevel(this.levelIndex);
         }
@@ -645,7 +666,6 @@ class Game {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   ButtonColor: () => (/* binding */ ButtonColor),
 /* harmony export */   Level: () => (/* binding */ Level)
 /* harmony export */ });
 /* harmony import */ var _constants__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../constants */ "./ts/constants.ts");
@@ -664,25 +684,19 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-var ButtonColor;
-(function (ButtonColor) {
-    ButtonColor["Red"] = "red";
-    ButtonColor["Yellow"] = "yellow";
-    ButtonColor["Blue"] = "blue";
-})(ButtonColor || (ButtonColor = {}));
 // Contains everything in one level, including the tiles and the entities.
 class Level {
     constructor(game, levelInfo) {
         this.entities = [];
         this.camera = new _camera__WEBPACK_IMPORTED_MODULE_2__.FocusCamera();
-        this.tiles = new _tile_tiles__WEBPACK_IMPORTED_MODULE_7__.Tiles(0, 0);
+        this.tiles = new _tile_tiles__WEBPACK_IMPORTED_MODULE_7__.Tiles(0, 0, this);
         this.start = { x: 0, y: 0 };
         this.keyReplayers = [];
         this.won = false;
         this.buttonState = {
-            [ButtonColor.Red]: false,
-            [ButtonColor.Yellow]: false,
-            [ButtonColor.Blue]: false,
+            [_tile_object_layer__WEBPACK_IMPORTED_MODULE_6__.ButtonColor.Red]: false,
+            [_tile_object_layer__WEBPACK_IMPORTED_MODULE_6__.ButtonColor.Yellow]: false,
+            [_tile_object_layer__WEBPACK_IMPORTED_MODULE_6__.ButtonColor.Blue]: false,
         };
         this.game = game;
         this.levelInfo = levelInfo;
@@ -691,7 +705,7 @@ class Level {
         const image = _lib_images__WEBPACK_IMPORTED_MODULE_1__.Images.images[this.levelInfo.name].image;
         this.image = image;
         this.entities = [];
-        this.tiles = new _tile_tiles__WEBPACK_IMPORTED_MODULE_7__.Tiles(image.width, image.height);
+        this.tiles = new _tile_tiles__WEBPACK_IMPORTED_MODULE_7__.Tiles(image.width, image.height, this);
         // Draw the image to a canvas to get the pixels.
         const canvas = document.createElement('canvas');
         canvas.width = image.width;
@@ -789,18 +803,18 @@ class Level {
         return player;
     }
     updateButtonState() {
-        this.buttonState[ButtonColor.Red] = false;
-        this.buttonState[ButtonColor.Yellow] = false;
-        this.buttonState[ButtonColor.Blue] = false;
+        this.buttonState[_tile_object_layer__WEBPACK_IMPORTED_MODULE_6__.ButtonColor.Red] = false;
+        this.buttonState[_tile_object_layer__WEBPACK_IMPORTED_MODULE_6__.ButtonColor.Yellow] = false;
+        this.buttonState[_tile_object_layer__WEBPACK_IMPORTED_MODULE_6__.ButtonColor.Blue] = false;
         for (const player of this.entitiesOfType(_entity_player__WEBPACK_IMPORTED_MODULE_3__.Player)) {
             if (player.isOnTile(this.tiles.objectLayer, _tile_object_layer__WEBPACK_IMPORTED_MODULE_6__.ObjectTile.RedButton)) {
-                this.buttonState[ButtonColor.Red] = true;
+                this.buttonState[_tile_object_layer__WEBPACK_IMPORTED_MODULE_6__.ButtonColor.Red] = true;
             }
             if (player.isOnTile(this.tiles.objectLayer, _tile_object_layer__WEBPACK_IMPORTED_MODULE_6__.ObjectTile.YellowButton)) {
-                this.buttonState[ButtonColor.Yellow] = true;
+                this.buttonState[_tile_object_layer__WEBPACK_IMPORTED_MODULE_6__.ButtonColor.Yellow] = true;
             }
             if (player.isOnTile(this.tiles.objectLayer, _tile_object_layer__WEBPACK_IMPORTED_MODULE_6__.ObjectTile.BlueButton)) {
-                this.buttonState[ButtonColor.Blue] = true;
+                this.buttonState[_tile_object_layer__WEBPACK_IMPORTED_MODULE_6__.ButtonColor.Blue] = true;
             }
         }
     }
@@ -822,7 +836,7 @@ class Level {
     }
     render(context) {
         this.camera.applyTransform(context);
-        this.tiles.render(context, this);
+        this.tiles.render(context);
         for (const entity of this.entities) {
             entity.render(context);
         }
@@ -859,14 +873,17 @@ __webpack_require__.r(__webpack_exports__);
 
 
 const LEVELS = [
-    {
-        name: 'level-test',
-    },
+    // {
+    //     name: 'level-test',
+    // },
     {
         name: 'level1',
     },
     {
         name: 'level2',
+    },
+    {
+        name: 'level-twoswitches',
     },
 ];
 class Levels {
@@ -1159,13 +1176,14 @@ class BaseLayer extends _tile_layer__WEBPACK_IMPORTED_MODULE_1__.TileLayer {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   ButtonColor: () => (/* binding */ ButtonColor),
 /* harmony export */   ObjectLayer: () => (/* binding */ ObjectLayer),
-/* harmony export */   ObjectTile: () => (/* binding */ ObjectTile)
+/* harmony export */   ObjectTile: () => (/* binding */ ObjectTile),
+/* harmony export */   getButtonColor: () => (/* binding */ getButtonColor),
+/* harmony export */   getNormalTileType: () => (/* binding */ getNormalTileType)
 /* harmony export */ });
 /* harmony import */ var _constants__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../constants */ "./ts/constants.ts");
-/* harmony import */ var _level__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../level */ "./ts/game/level.ts");
-/* harmony import */ var _tile_layer__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./tile-layer */ "./ts/game/tile/tile-layer.ts");
-
+/* harmony import */ var _tile_layer__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./tile-layer */ "./ts/game/tile/tile-layer.ts");
 
 
 var ObjectTile;
@@ -1173,6 +1191,10 @@ var ObjectTile;
     ObjectTile[ObjectTile["Empty"] = 0] = "Empty";
     ObjectTile[ObjectTile["Spawn"] = 1] = "Spawn";
     ObjectTile[ObjectTile["Goal"] = 2] = "Goal";
+    // Not actually used in the tile set but calculated from the things below.
+    ObjectTile[ObjectTile["Button"] = 3] = "Button";
+    ObjectTile[ObjectTile["Spikes"] = 4] = "Spikes";
+    ObjectTile[ObjectTile["Bridge"] = 5] = "Bridge";
     ObjectTile[ObjectTile["RedButton"] = 10] = "RedButton";
     ObjectTile[ObjectTile["RedSpikes"] = 11] = "RedSpikes";
     ObjectTile[ObjectTile["RedBridge"] = 12] = "RedBridge";
@@ -1183,6 +1205,25 @@ var ObjectTile;
     ObjectTile[ObjectTile["BlueSpikes"] = 31] = "BlueSpikes";
     ObjectTile[ObjectTile["BlueBridge"] = 32] = "BlueBridge";
 })(ObjectTile || (ObjectTile = {}));
+var ButtonColor;
+(function (ButtonColor) {
+    ButtonColor[ButtonColor["Red"] = 1] = "Red";
+    ButtonColor[ButtonColor["Yellow"] = 2] = "Yellow";
+    ButtonColor[ButtonColor["Blue"] = 3] = "Blue";
+})(ButtonColor || (ButtonColor = {}));
+function getButtonColor(tile) {
+    if (tile == ObjectTile.Empty) {
+        return undefined;
+    }
+    return Math.floor(tile / 10);
+}
+// Only relevant for colored tiles.
+function getNormalTileType(tile) {
+    if (tile >= ObjectTile.RedButton) {
+        return (tile % 10) + ObjectTile.Button;
+    }
+    return tile;
+}
 // Position of the tile in the tileset.
 const tilePositions = {
     [ObjectTile.Spawn]: { x: 7, y: 0 },
@@ -1197,7 +1238,7 @@ const tilePositions = {
     [ObjectTile.BlueSpikes]: { x: 5, y: 4 },
     [ObjectTile.BlueBridge]: { x: 5, y: 6 },
 };
-class ObjectLayer extends _tile_layer__WEBPACK_IMPORTED_MODULE_2__.TileLayer {
+class ObjectLayer extends _tile_layer__WEBPACK_IMPORTED_MODULE_1__.TileLayer {
     renderTile(context, pos, level) {
         const tile = this.getTile(pos);
         const renderPos = { x: pos.x * _constants__WEBPACK_IMPORTED_MODULE_0__.TILE_SIZE, y: pos.y * _constants__WEBPACK_IMPORTED_MODULE_0__.TILE_SIZE };
@@ -1206,13 +1247,8 @@ class ObjectLayer extends _tile_layer__WEBPACK_IMPORTED_MODULE_2__.TileLayer {
             return;
         }
         const pos2 = { x: tilePos.x, y: tilePos.y };
-        if (Math.floor(tile / 10) == 1 && level.buttonState[_level__WEBPACK_IMPORTED_MODULE_1__.ButtonColor.Red]) {
-            pos2.y += 1;
-        }
-        if (Math.floor(tile / 10) == 2 && level.buttonState[_level__WEBPACK_IMPORTED_MODULE_1__.ButtonColor.Yellow]) {
-            pos2.y += 1;
-        }
-        if (Math.floor(tile / 10) == 3 && level.buttonState[_level__WEBPACK_IMPORTED_MODULE_1__.ButtonColor.Blue]) {
+        const buttonColor = getButtonColor(tile);
+        if (buttonColor != undefined && level.buttonState[buttonColor]) {
             pos2.y += 1;
         }
         this.drawTile(context, { tilePos: pos2, renderPos });
@@ -1393,22 +1429,24 @@ var PhysicTile;
     PhysicTile[PhysicTile["Empty"] = 0] = "Empty";
     PhysicTile[PhysicTile["Wall"] = 1] = "Wall";
     PhysicTile[PhysicTile["Hole"] = 2] = "Hole";
+    PhysicTile[PhysicTile["Spikes"] = 3] = "Spikes";
 })(PhysicTile || (PhysicTile = {}));
 /**
  * 2D array of tiles.
  */
 class Tiles {
-    constructor(w, h) {
+    constructor(w, h, level) {
         this.baseLayer = new _base_layer__WEBPACK_IMPORTED_MODULE_2__.BaseLayer(w, h);
         this.objectLayer = new _object_layer__WEBPACK_IMPORTED_MODULE_3__.ObjectLayer(w, h);
+        this.level = level;
     }
     update(dt) {
         this.baseLayer.update(dt);
         this.objectLayer.update(dt);
     }
-    render(context, level) {
-        this.baseLayer.render(context, level);
-        this.objectLayer.render(context, level);
+    render(context) {
+        this.baseLayer.render(context, this.level);
+        this.objectLayer.render(context, this.level);
     }
     getTileCoord(p, positionInTile) {
         return {
@@ -1424,10 +1462,20 @@ class Tiles {
     }
     getTile(p) {
         const baseTile = this.baseLayer.getTile(p);
+        const objectTile = this.objectLayer.getTile(p);
+        const objectButtonColor = (0,_object_layer__WEBPACK_IMPORTED_MODULE_3__.getButtonColor)(objectTile);
+        const normalObjectTile = (0,_object_layer__WEBPACK_IMPORTED_MODULE_3__.getNormalTileType)(objectTile);
+        const colorActive = objectButtonColor != undefined && this.level.buttonState[objectButtonColor];
+        if (normalObjectTile == _object_layer__WEBPACK_IMPORTED_MODULE_3__.ObjectTile.Spikes && colorActive) {
+            return PhysicTile.Spikes;
+        }
+        if (normalObjectTile == _object_layer__WEBPACK_IMPORTED_MODULE_3__.ObjectTile.Bridge && colorActive) {
+            return PhysicTile.Empty;
+        }
         if (baseTile == _base_layer__WEBPACK_IMPORTED_MODULE_2__.BaseTile.Wall) {
             return PhysicTile.Wall;
         }
-        else if (baseTile == _base_layer__WEBPACK_IMPORTED_MODULE_2__.BaseTile.Hole) {
+        if (baseTile == _base_layer__WEBPACK_IMPORTED_MODULE_2__.BaseTile.Hole) {
             return PhysicTile.Hole;
         }
         return PhysicTile.Empty;
