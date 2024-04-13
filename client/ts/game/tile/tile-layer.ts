@@ -1,8 +1,7 @@
 import { Point } from "../../common";
-import { PHYSICS_SCALE, rng, TILE_SIZE, TILE_SIZE_PX } from "../../constants";
-import { Aseprite, images } from "../../lib/aseprite";
+import { TILE_SIZE, TILE_SIZE_PX } from "../../constants";
 import { Images } from "../../lib/images";
-import { ObjectTile } from "./object-layer";
+import { Level } from "../level";
 import { TileSource } from "./tiles";
 
 /**
@@ -39,7 +38,7 @@ export class TileLayer<T extends number> implements TileSource<T> {
         this.animCount += dt;
     }
 
-    render(context: CanvasRenderingContext2D) {
+    render(context: CanvasRenderingContext2D, level: Level) {
         if (!this.image) {
             const imageInfo = Images.images["tiles"];
             if (!imageInfo.loaded) {
@@ -62,7 +61,7 @@ export class TileLayer<T extends number> implements TileSource<T> {
 
         for (let y = minYTile; y <= maxYTile; y++) {
             for (let x = minXTile; x <= maxXTile; x++) {
-                this.renderTile(context, { x, y });
+                this.renderTile(context, { x, y }, level);
             }
         }
     }
@@ -70,6 +69,7 @@ export class TileLayer<T extends number> implements TileSource<T> {
     renderTile(
         context: CanvasRenderingContext2D,
         pos: Point,
+        level: Level,
     ) {
         // Logic handled per layer.
     }

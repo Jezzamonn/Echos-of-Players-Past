@@ -7,13 +7,13 @@ export const TIME_STEP = 1 / FPS;
 
 export const PIXEL_SCALE = 4;
 
-export const GAME_WIDTH_PX = 200;
-export const GAME_HEIGHT_PX = 150;
-export const GAME_WIDTH = GAME_WIDTH_PX * PHYSICS_SCALE;
-export const GAME_HEIGHT = GAME_HEIGHT_PX * PHYSICS_SCALE;
-
 export const TILE_SIZE_PX = 16;
 export const TILE_SIZE = TILE_SIZE_PX * PHYSICS_SCALE;
+
+export const GAME_WIDTH_PX = 16 * TILE_SIZE_PX;
+export const GAME_HEIGHT_PX = 12 * TILE_SIZE_PX;
+export const GAME_WIDTH = GAME_WIDTH_PX * PHYSICS_SCALE;
+export const GAME_HEIGHT = GAME_HEIGHT_PX * PHYSICS_SCALE;
 
 export const LEFT_KEYS = ['KeyA', 'ArrowLeft'];
 export const RIGHT_KEYS = ['KeyD', 'ArrowRight'];

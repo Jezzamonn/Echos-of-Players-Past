@@ -1,6 +1,7 @@
 import { Point } from "../../common";
 import { TILE_SIZE } from "../../constants";
 import { Images } from "../../lib/images";
+import { Level } from "../level";
 import { BaseLayer, BaseTile } from "./base-layer";
 import { ObjectLayer } from "./object-layer";
 
@@ -34,9 +35,9 @@ export class Tiles implements TileSource<PhysicTile> {
         this.objectLayer.update(dt);
     }
 
-    render(context: CanvasRenderingContext2D) {
-        this.baseLayer.render(context);
-        this.objectLayer.render(context);
+    render(context: CanvasRenderingContext2D, level: Level) {
+        this.baseLayer.render(context, level);
+        this.objectLayer.render(context, level);
     }
 
     getTileCoord(p: Point, positionInTile: Point): Point {

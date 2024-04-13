@@ -1,4 +1,5 @@
 import { Point } from "../common";
+import { TILE_SIZE } from "../constants";
 import { Images } from "../lib/images";
 import { RegularKeys } from "../lib/keys";
 import { FocusCamera } from "./camera";
@@ -11,6 +12,12 @@ import { KeyReplayer } from "./recordreplay/key-replayer";
 import { BaseTile } from "./tile/base-layer";
 import { ObjectTile } from "./tile/object-layer";
 import { Tiles } from "./tile/tiles";
+
+export enum ButtonColor {
+    Red = 'red',
+    Yellow = 'yellow',
+    Blue = 'blue',
+}
 
 // Contains everything in one level, including the tiles and the entities.
 export class Level {
@@ -28,6 +35,12 @@ export class Level {
     keyReplayers: KeyReplayer[] = [];
 
     won = false;
+
+    buttonState: { [key in ButtonColor]: boolean } = {
+        [ButtonColor.Red]: false,
+        [ButtonColor.Yellow]: false,
+        [ButtonColor.Blue]: false,
+    }
 
     constructor(game: Game, levelInfo: LevelInfo) {
         this.game = game;
@@ -62,13 +75,52 @@ export class Level {
                 else if (color === 'aaaaaa') {
                     this.tiles.baseLayer.setTile({ x, y }, BaseTile.Hole, { allowGrow: false });
                 }
-                else if (color === 'ffff00') {
+                else if (color === '00ff00') {
                     this.tiles.objectLayer.setTile({ x, y }, ObjectTile.Goal, { allowGrow: false });
                     this.tiles.baseLayer.setTile({ x, y }, BaseTile.Empty, { allowGrow: false });
                 }
-                else if (color === 'ff0000') {
+                else if (color === 'ff00ff') {
                     this.start = this.tiles.getTileCoord({x, y}, { x: 0.5, y: 0.5 });
                     this.tiles.objectLayer.setTile({ x, y }, ObjectTile.Spawn, { allowGrow: false });
+                    this.tiles.baseLayer.setTile({ x, y }, BaseTile.Empty, { allowGrow: false });
+                }
+                // Red interactables
+                else if (color === 'ff0000') {
+                    this.tiles.objectLayer.setTile({ x, y }, ObjectTile.RedButton, { allowGrow: false });
+                    this.tiles.baseLayer.setTile({ x, y }, BaseTile.Empty, { allowGrow: false });
+                }
+                else if (color === 'ff0050') {
+                    this.tiles.objectLayer.setTile({ x, y }, ObjectTile.RedBridge, { allowGrow: false });
+                    this.tiles.baseLayer.setTile({ x, y }, BaseTile.Hole, { allowGrow: false });
+                }
+                else if (color === 'ff0090') {
+                    this.tiles.objectLayer.setTile({ x, y }, ObjectTile.RedSpikes, { allowGrow: false });
+                    this.tiles.baseLayer.setTile({ x, y }, BaseTile.Empty, { allowGrow: false });
+                }
+                // Yellow interactables
+                else if (color === 'ffff00') {
+                    this.tiles.objectLayer.setTile({ x, y }, ObjectTile.YellowButton, { allowGrow: false });
+                    this.tiles.baseLayer.setTile({ x, y }, BaseTile.Empty, { allowGrow: false });
+                }
+                else if (color === 'ffff50') {
+                    this.tiles.objectLayer.setTile({ x, y }, ObjectTile.YellowBridge, { allowGrow: false });
+                    this.tiles.baseLayer.setTile({ x, y }, BaseTile.Hole, { allowGrow: false });
+                }
+                else if (color === 'ffff90') {
+                    this.tiles.objectLayer.setTile({ x, y }, ObjectTile.YellowSpikes, { allowGrow: false });
+                    this.tiles.baseLayer.setTile({ x, y }, BaseTile.Empty, { allowGrow: false });
+                }
+                // Blue interactables
+                else if (color === '0000ff') {
+                    this.tiles.objectLayer.setTile({ x, y }, ObjectTile.BlueButton, { allowGrow: false });
+                    this.tiles.baseLayer.setTile({ x, y }, BaseTile.Empty, { allowGrow: false });
+                }
+                else if (color === '0050ff') {
+                    this.tiles.objectLayer.setTile({ x, y }, ObjectTile.BlueBridge, { allowGrow: false });
+                    this.tiles.baseLayer.setTile({ x, y }, BaseTile.Hole, { allowGrow: false });
+                }
+                else if (color === '0090ff') {
+                    this.tiles.objectLayer.setTile({ x, y }, ObjectTile.BlueSpikes, { allowGrow: false });
                     this.tiles.baseLayer.setTile({ x, y }, BaseTile.Empty, { allowGrow: false });
                 }
                 else {
@@ -77,13 +129,18 @@ export class Level {
             }
         }
 
-        // this.camera.target = () => ({x: this.start.x, y: this.start.y});
-
         const player = this.spawnPlayer();
-        this.camera.target = () => player.cameraFocus();
+        // this.camera.target = () => player.cameraFocus();
+
         player.onFirstInput = () => {
             this.keyReplayers.forEach(replayer => replayer.start());
         }
+
+        this.camera.target = () => ({x: image.width * TILE_SIZE / 2, y: (image.height + 2) * TILE_SIZE / 2});
+    }
+
+    entitiesOfType<T>(type: new (...args: any[]) => T): T[] {
+        return this.entities.filter(e => e instanceof type) as T[];
     }
 
     spawnPlayer(keyHistory: KeyHistory | undefined = undefined) {
@@ -101,10 +158,28 @@ export class Level {
         return player;
     }
 
+    updateButtonState() {
+        this.buttonState[ButtonColor.Red] = false;
+        this.buttonState[ButtonColor.Yellow] = false;
+        this.buttonState[ButtonColor.Blue] = false;
+        for (const player of this.entitiesOfType(Player)) {
+            if (player.isOnTile(this.tiles.objectLayer, ObjectTile.RedButton)) {
+                this.buttonState[ButtonColor.Red] = true;
+            }
+            if (player.isOnTile(this.tiles.objectLayer, ObjectTile.YellowButton)) {
+                this.buttonState[ButtonColor.Yellow] = true;
+            }
+            if (player.isOnTile(this.tiles.objectLayer, ObjectTile.BlueButton)) {
+                this.buttonState[ButtonColor.Blue] = true;
+            }
+        }
+    }
+
     update(dt: number) {
         for (const entity of this.entities) {
             entity.update(dt);
         }
+        this.updateButtonState();
 
         for (let i = this.entities.length - 1; i >= 0; i--) {
             if (this.entities[i].done) {
@@ -123,7 +198,7 @@ export class Level {
     render(context: CanvasRenderingContext2D) {
         this.camera.applyTransform(context);
 
-        this.tiles.render(context);
+        this.tiles.render(context, this);
 
         for (const entity of this.entities) {
             entity.render(context);

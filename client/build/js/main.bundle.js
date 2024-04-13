@@ -85,12 +85,12 @@ const PHYSICS_SCALE = 16;
 const FPS = 60;
 const TIME_STEP = 1 / FPS;
 const PIXEL_SCALE = 4;
-const GAME_WIDTH_PX = 200;
-const GAME_HEIGHT_PX = 150;
-const GAME_WIDTH = GAME_WIDTH_PX * PHYSICS_SCALE;
-const GAME_HEIGHT = GAME_HEIGHT_PX * PHYSICS_SCALE;
 const TILE_SIZE_PX = 16;
 const TILE_SIZE = TILE_SIZE_PX * PHYSICS_SCALE;
+const GAME_WIDTH_PX = 16 * TILE_SIZE_PX;
+const GAME_HEIGHT_PX = 12 * TILE_SIZE_PX;
+const GAME_WIDTH = GAME_WIDTH_PX * PHYSICS_SCALE;
+const GAME_HEIGHT = GAME_HEIGHT_PX * PHYSICS_SCALE;
 const LEFT_KEYS = ['KeyA', 'ArrowLeft'];
 const RIGHT_KEYS = ['KeyD', 'ArrowRight'];
 const UP_KEYS = ['KeyW', 'ArrowUp'];
@@ -645,15 +645,17 @@ class Game {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   ButtonColor: () => (/* binding */ ButtonColor),
 /* harmony export */   Level: () => (/* binding */ Level)
 /* harmony export */ });
-/* harmony import */ var _lib_images__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../lib/images */ "./ts/lib/images.ts");
-/* harmony import */ var _camera__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./camera */ "./ts/game/camera.ts");
-/* harmony import */ var _entity_player__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./entity/player */ "./ts/game/entity/player.ts");
-/* harmony import */ var _recordreplay_key_replayer__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./recordreplay/key-replayer */ "./ts/game/recordreplay/key-replayer.ts");
-/* harmony import */ var _tile_base_layer__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./tile/base-layer */ "./ts/game/tile/base-layer.ts");
-/* harmony import */ var _tile_object_layer__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./tile/object-layer */ "./ts/game/tile/object-layer.ts");
-/* harmony import */ var _tile_tiles__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./tile/tiles */ "./ts/game/tile/tiles.ts");
+/* harmony import */ var _constants__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../constants */ "./ts/constants.ts");
+/* harmony import */ var _lib_images__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../lib/images */ "./ts/lib/images.ts");
+/* harmony import */ var _camera__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./camera */ "./ts/game/camera.ts");
+/* harmony import */ var _entity_player__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./entity/player */ "./ts/game/entity/player.ts");
+/* harmony import */ var _recordreplay_key_replayer__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./recordreplay/key-replayer */ "./ts/game/recordreplay/key-replayer.ts");
+/* harmony import */ var _tile_base_layer__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./tile/base-layer */ "./ts/game/tile/base-layer.ts");
+/* harmony import */ var _tile_object_layer__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./tile/object-layer */ "./ts/game/tile/object-layer.ts");
+/* harmony import */ var _tile_tiles__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./tile/tiles */ "./ts/game/tile/tiles.ts");
 
 
 
@@ -661,23 +663,35 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+
+var ButtonColor;
+(function (ButtonColor) {
+    ButtonColor["Red"] = "red";
+    ButtonColor["Yellow"] = "yellow";
+    ButtonColor["Blue"] = "blue";
+})(ButtonColor || (ButtonColor = {}));
 // Contains everything in one level, including the tiles and the entities.
 class Level {
     constructor(game, levelInfo) {
         this.entities = [];
-        this.camera = new _camera__WEBPACK_IMPORTED_MODULE_1__.FocusCamera();
-        this.tiles = new _tile_tiles__WEBPACK_IMPORTED_MODULE_6__.Tiles(0, 0);
+        this.camera = new _camera__WEBPACK_IMPORTED_MODULE_2__.FocusCamera();
+        this.tiles = new _tile_tiles__WEBPACK_IMPORTED_MODULE_7__.Tiles(0, 0);
         this.start = { x: 0, y: 0 };
         this.keyReplayers = [];
         this.won = false;
+        this.buttonState = {
+            [ButtonColor.Red]: false,
+            [ButtonColor.Yellow]: false,
+            [ButtonColor.Blue]: false,
+        };
         this.game = game;
         this.levelInfo = levelInfo;
     }
     initFromImage() {
-        const image = _lib_images__WEBPACK_IMPORTED_MODULE_0__.Images.images[this.levelInfo.name].image;
+        const image = _lib_images__WEBPACK_IMPORTED_MODULE_1__.Images.images[this.levelInfo.name].image;
         this.image = image;
         this.entities = [];
-        this.tiles = new _tile_tiles__WEBPACK_IMPORTED_MODULE_6__.Tiles(image.width, image.height);
+        this.tiles = new _tile_tiles__WEBPACK_IMPORTED_MODULE_7__.Tiles(image.width, image.height);
         // Draw the image to a canvas to get the pixels.
         const canvas = document.createElement('canvas');
         canvas.width = image.width;
@@ -693,49 +707,108 @@ class Level {
                     // Don't need to do anything for empty tiles as they're the default.
                 }
                 else if (color === '000000') {
-                    this.tiles.baseLayer.setTile({ x, y }, _tile_base_layer__WEBPACK_IMPORTED_MODULE_4__.BaseTile.Wall, { allowGrow: false });
+                    this.tiles.baseLayer.setTile({ x, y }, _tile_base_layer__WEBPACK_IMPORTED_MODULE_5__.BaseTile.Wall, { allowGrow: false });
                 }
                 else if (color === 'aaaaaa') {
-                    this.tiles.baseLayer.setTile({ x, y }, _tile_base_layer__WEBPACK_IMPORTED_MODULE_4__.BaseTile.Hole, { allowGrow: false });
+                    this.tiles.baseLayer.setTile({ x, y }, _tile_base_layer__WEBPACK_IMPORTED_MODULE_5__.BaseTile.Hole, { allowGrow: false });
                 }
-                else if (color === 'ffff00') {
-                    this.tiles.objectLayer.setTile({ x, y }, _tile_object_layer__WEBPACK_IMPORTED_MODULE_5__.ObjectTile.Goal, { allowGrow: false });
-                    this.tiles.baseLayer.setTile({ x, y }, _tile_base_layer__WEBPACK_IMPORTED_MODULE_4__.BaseTile.Empty, { allowGrow: false });
+                else if (color === '00ff00') {
+                    this.tiles.objectLayer.setTile({ x, y }, _tile_object_layer__WEBPACK_IMPORTED_MODULE_6__.ObjectTile.Goal, { allowGrow: false });
+                    this.tiles.baseLayer.setTile({ x, y }, _tile_base_layer__WEBPACK_IMPORTED_MODULE_5__.BaseTile.Empty, { allowGrow: false });
                 }
-                else if (color === 'ff0000') {
+                else if (color === 'ff00ff') {
                     this.start = this.tiles.getTileCoord({ x, y }, { x: 0.5, y: 0.5 });
-                    this.tiles.objectLayer.setTile({ x, y }, _tile_object_layer__WEBPACK_IMPORTED_MODULE_5__.ObjectTile.Spawn, { allowGrow: false });
-                    this.tiles.baseLayer.setTile({ x, y }, _tile_base_layer__WEBPACK_IMPORTED_MODULE_4__.BaseTile.Empty, { allowGrow: false });
+                    this.tiles.objectLayer.setTile({ x, y }, _tile_object_layer__WEBPACK_IMPORTED_MODULE_6__.ObjectTile.Spawn, { allowGrow: false });
+                    this.tiles.baseLayer.setTile({ x, y }, _tile_base_layer__WEBPACK_IMPORTED_MODULE_5__.BaseTile.Empty, { allowGrow: false });
+                }
+                // Red interactables
+                else if (color === 'ff0000') {
+                    this.tiles.objectLayer.setTile({ x, y }, _tile_object_layer__WEBPACK_IMPORTED_MODULE_6__.ObjectTile.RedButton, { allowGrow: false });
+                    this.tiles.baseLayer.setTile({ x, y }, _tile_base_layer__WEBPACK_IMPORTED_MODULE_5__.BaseTile.Empty, { allowGrow: false });
+                }
+                else if (color === 'ff0050') {
+                    this.tiles.objectLayer.setTile({ x, y }, _tile_object_layer__WEBPACK_IMPORTED_MODULE_6__.ObjectTile.RedBridge, { allowGrow: false });
+                    this.tiles.baseLayer.setTile({ x, y }, _tile_base_layer__WEBPACK_IMPORTED_MODULE_5__.BaseTile.Hole, { allowGrow: false });
+                }
+                else if (color === 'ff0090') {
+                    this.tiles.objectLayer.setTile({ x, y }, _tile_object_layer__WEBPACK_IMPORTED_MODULE_6__.ObjectTile.RedSpikes, { allowGrow: false });
+                    this.tiles.baseLayer.setTile({ x, y }, _tile_base_layer__WEBPACK_IMPORTED_MODULE_5__.BaseTile.Empty, { allowGrow: false });
+                }
+                // Yellow interactables
+                else if (color === 'ffff00') {
+                    this.tiles.objectLayer.setTile({ x, y }, _tile_object_layer__WEBPACK_IMPORTED_MODULE_6__.ObjectTile.YellowButton, { allowGrow: false });
+                    this.tiles.baseLayer.setTile({ x, y }, _tile_base_layer__WEBPACK_IMPORTED_MODULE_5__.BaseTile.Empty, { allowGrow: false });
+                }
+                else if (color === 'ffff50') {
+                    this.tiles.objectLayer.setTile({ x, y }, _tile_object_layer__WEBPACK_IMPORTED_MODULE_6__.ObjectTile.YellowBridge, { allowGrow: false });
+                    this.tiles.baseLayer.setTile({ x, y }, _tile_base_layer__WEBPACK_IMPORTED_MODULE_5__.BaseTile.Hole, { allowGrow: false });
+                }
+                else if (color === 'ffff90') {
+                    this.tiles.objectLayer.setTile({ x, y }, _tile_object_layer__WEBPACK_IMPORTED_MODULE_6__.ObjectTile.YellowSpikes, { allowGrow: false });
+                    this.tiles.baseLayer.setTile({ x, y }, _tile_base_layer__WEBPACK_IMPORTED_MODULE_5__.BaseTile.Empty, { allowGrow: false });
+                }
+                // Blue interactables
+                else if (color === '0000ff') {
+                    this.tiles.objectLayer.setTile({ x, y }, _tile_object_layer__WEBPACK_IMPORTED_MODULE_6__.ObjectTile.BlueButton, { allowGrow: false });
+                    this.tiles.baseLayer.setTile({ x, y }, _tile_base_layer__WEBPACK_IMPORTED_MODULE_5__.BaseTile.Empty, { allowGrow: false });
+                }
+                else if (color === '0050ff') {
+                    this.tiles.objectLayer.setTile({ x, y }, _tile_object_layer__WEBPACK_IMPORTED_MODULE_6__.ObjectTile.BlueBridge, { allowGrow: false });
+                    this.tiles.baseLayer.setTile({ x, y }, _tile_base_layer__WEBPACK_IMPORTED_MODULE_5__.BaseTile.Hole, { allowGrow: false });
+                }
+                else if (color === '0090ff') {
+                    this.tiles.objectLayer.setTile({ x, y }, _tile_object_layer__WEBPACK_IMPORTED_MODULE_6__.ObjectTile.BlueSpikes, { allowGrow: false });
+                    this.tiles.baseLayer.setTile({ x, y }, _tile_base_layer__WEBPACK_IMPORTED_MODULE_5__.BaseTile.Empty, { allowGrow: false });
                 }
                 else {
                     console.log(`Unknown color: ${color} at ${x}, ${y}.`);
                 }
             }
         }
-        // this.camera.target = () => ({x: this.start.x, y: this.start.y});
         const player = this.spawnPlayer();
-        this.camera.target = () => player.cameraFocus();
+        // this.camera.target = () => player.cameraFocus();
         player.onFirstInput = () => {
             this.keyReplayers.forEach(replayer => replayer.start());
         };
+        this.camera.target = () => ({ x: image.width * _constants__WEBPACK_IMPORTED_MODULE_0__.TILE_SIZE / 2, y: (image.height + 2) * _constants__WEBPACK_IMPORTED_MODULE_0__.TILE_SIZE / 2 });
+    }
+    entitiesOfType(type) {
+        return this.entities.filter(e => e instanceof type);
     }
     spawnPlayer(keyHistory = undefined) {
         let keys = this.game.keys;
         if (keyHistory != undefined) {
-            const replayer = new _recordreplay_key_replayer__WEBPACK_IMPORTED_MODULE_3__.KeyReplayer(keyHistory);
+            const replayer = new _recordreplay_key_replayer__WEBPACK_IMPORTED_MODULE_4__.KeyReplayer(keyHistory);
             this.keyReplayers.push(replayer);
             keys = replayer;
         }
-        const player = new _entity_player__WEBPACK_IMPORTED_MODULE_2__.Player(this, keys, keyHistory == undefined);
+        const player = new _entity_player__WEBPACK_IMPORTED_MODULE_3__.Player(this, keys, keyHistory == undefined);
         player.midX = this.start.x;
         player.maxY = this.start.y;
         this.entities.push(player);
         return player;
     }
+    updateButtonState() {
+        this.buttonState[ButtonColor.Red] = false;
+        this.buttonState[ButtonColor.Yellow] = false;
+        this.buttonState[ButtonColor.Blue] = false;
+        for (const player of this.entitiesOfType(_entity_player__WEBPACK_IMPORTED_MODULE_3__.Player)) {
+            if (player.isOnTile(this.tiles.objectLayer, _tile_object_layer__WEBPACK_IMPORTED_MODULE_6__.ObjectTile.RedButton)) {
+                this.buttonState[ButtonColor.Red] = true;
+            }
+            if (player.isOnTile(this.tiles.objectLayer, _tile_object_layer__WEBPACK_IMPORTED_MODULE_6__.ObjectTile.YellowButton)) {
+                this.buttonState[ButtonColor.Yellow] = true;
+            }
+            if (player.isOnTile(this.tiles.objectLayer, _tile_object_layer__WEBPACK_IMPORTED_MODULE_6__.ObjectTile.BlueButton)) {
+                this.buttonState[ButtonColor.Blue] = true;
+            }
+        }
+    }
     update(dt) {
         for (const entity of this.entities) {
             entity.update(dt);
         }
+        this.updateButtonState();
         for (let i = this.entities.length - 1; i >= 0; i--) {
             if (this.entities[i].done) {
                 this.entities.splice(i, 1);
@@ -749,7 +822,7 @@ class Level {
     }
     render(context) {
         this.camera.applyTransform(context);
-        this.tiles.render(context);
+        this.tiles.render(context, this);
         for (const entity of this.entities) {
             entity.render(context);
         }
@@ -786,6 +859,9 @@ __webpack_require__.r(__webpack_exports__);
 
 
 const LEVELS = [
+    {
+        name: 'level-test',
+    },
     {
         name: 'level1',
     },
@@ -1087,7 +1163,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   ObjectTile: () => (/* binding */ ObjectTile)
 /* harmony export */ });
 /* harmony import */ var _constants__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../constants */ "./ts/constants.ts");
-/* harmony import */ var _tile_layer__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./tile-layer */ "./ts/game/tile/tile-layer.ts");
+/* harmony import */ var _level__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../level */ "./ts/game/level.ts");
+/* harmony import */ var _tile_layer__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./tile-layer */ "./ts/game/tile/tile-layer.ts");
+
 
 
 var ObjectTile;
@@ -1095,21 +1173,49 @@ var ObjectTile;
     ObjectTile[ObjectTile["Empty"] = 0] = "Empty";
     ObjectTile[ObjectTile["Spawn"] = 1] = "Spawn";
     ObjectTile[ObjectTile["Goal"] = 2] = "Goal";
+    ObjectTile[ObjectTile["RedButton"] = 10] = "RedButton";
+    ObjectTile[ObjectTile["RedSpikes"] = 11] = "RedSpikes";
+    ObjectTile[ObjectTile["RedBridge"] = 12] = "RedBridge";
+    ObjectTile[ObjectTile["YellowButton"] = 20] = "YellowButton";
+    ObjectTile[ObjectTile["YellowSpikes"] = 21] = "YellowSpikes";
+    ObjectTile[ObjectTile["YellowBridge"] = 22] = "YellowBridge";
+    ObjectTile[ObjectTile["BlueButton"] = 30] = "BlueButton";
+    ObjectTile[ObjectTile["BlueSpikes"] = 31] = "BlueSpikes";
+    ObjectTile[ObjectTile["BlueBridge"] = 32] = "BlueBridge";
 })(ObjectTile || (ObjectTile = {}));
 // Position of the tile in the tileset.
 const tilePositions = {
     [ObjectTile.Spawn]: { x: 7, y: 0 },
     [ObjectTile.Goal]: { x: 7, y: 1 },
+    [ObjectTile.RedButton]: { x: 7, y: 2 },
+    [ObjectTile.RedSpikes]: { x: 7, y: 4 },
+    [ObjectTile.RedBridge]: { x: 7, y: 6 },
+    [ObjectTile.YellowButton]: { x: 6, y: 2 },
+    [ObjectTile.YellowSpikes]: { x: 6, y: 4 },
+    [ObjectTile.YellowBridge]: { x: 6, y: 6 },
+    [ObjectTile.BlueButton]: { x: 5, y: 2 },
+    [ObjectTile.BlueSpikes]: { x: 5, y: 4 },
+    [ObjectTile.BlueBridge]: { x: 5, y: 6 },
 };
-class ObjectLayer extends _tile_layer__WEBPACK_IMPORTED_MODULE_1__.TileLayer {
-    renderTile(context, pos) {
+class ObjectLayer extends _tile_layer__WEBPACK_IMPORTED_MODULE_2__.TileLayer {
+    renderTile(context, pos, level) {
         const tile = this.getTile(pos);
         const renderPos = { x: pos.x * _constants__WEBPACK_IMPORTED_MODULE_0__.TILE_SIZE, y: pos.y * _constants__WEBPACK_IMPORTED_MODULE_0__.TILE_SIZE };
         const tilePos = tilePositions[tile];
-        if (!tilePos) {
+        if (tilePos == undefined) {
             return;
         }
-        this.drawTile(context, { tilePos, renderPos });
+        const pos2 = { x: tilePos.x, y: tilePos.y };
+        if (Math.floor(tile / 10) == 1 && level.buttonState[_level__WEBPACK_IMPORTED_MODULE_1__.ButtonColor.Red]) {
+            pos2.y += 1;
+        }
+        if (Math.floor(tile / 10) == 2 && level.buttonState[_level__WEBPACK_IMPORTED_MODULE_1__.ButtonColor.Yellow]) {
+            pos2.y += 1;
+        }
+        if (Math.floor(tile / 10) == 3 && level.buttonState[_level__WEBPACK_IMPORTED_MODULE_1__.ButtonColor.Blue]) {
+            pos2.y += 1;
+        }
+        this.drawTile(context, { tilePos: pos2, renderPos });
     }
 }
 
@@ -1155,7 +1261,7 @@ class TileLayer {
     update(dt) {
         this.animCount += dt;
     }
-    render(context) {
+    render(context, level) {
         if (!this.image) {
             const imageInfo = _lib_images__WEBPACK_IMPORTED_MODULE_1__.Images.images["tiles"];
             if (!imageInfo.loaded) {
@@ -1175,11 +1281,11 @@ class TileLayer {
         const maxYTile = Math.floor(gameMaxPoint.y / _constants__WEBPACK_IMPORTED_MODULE_0__.TILE_SIZE);
         for (let y = minYTile; y <= maxYTile; y++) {
             for (let x = minXTile; x <= maxXTile; x++) {
-                this.renderTile(context, { x, y });
+                this.renderTile(context, { x, y }, level);
             }
         }
     }
-    renderTile(context, pos) {
+    renderTile(context, pos, level) {
         // Logic handled per layer.
     }
     drawTile(context, { tilePos, renderPos, }) {
@@ -1300,9 +1406,9 @@ class Tiles {
         this.baseLayer.update(dt);
         this.objectLayer.update(dt);
     }
-    render(context) {
-        this.baseLayer.render(context);
-        this.objectLayer.render(context);
+    render(context, level) {
+        this.baseLayer.render(context, level);
+        this.objectLayer.render(context, level);
     }
     getTileCoord(p, positionInTile) {
         return {
