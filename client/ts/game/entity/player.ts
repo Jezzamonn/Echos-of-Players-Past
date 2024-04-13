@@ -1,8 +1,9 @@
 import { FacingDir, Point } from "../../common";
-import { DOWN_KEYS, FPS, LEFT_KEYS, PHYSICS_SCALE, RIGHT_KEYS, UP_KEYS, physFromPx } from "../../constants";
+import { ACTION_KEYS, DOWN_KEYS, FPS, LEFT_KEYS, PHYSICS_SCALE, RIGHT_KEYS, UP_KEYS, physFromPx } from "../../constants";
 import { Aseprite } from "../../lib/aseprite";
-import { NullKeys } from "../../lib/keys";
+import { RegularKeys } from "../../lib/keys";
 import { Level } from "../level";
+import { KeyRecorder } from "../recordreplay/key-recorder";
 import { ObjectTile } from "../tile/object-layer";
 import { Entity } from "./entity";
 
@@ -12,14 +13,23 @@ export class Player extends Entity {
 
     runSpeed = 1 * PHYSICS_SCALE * FPS;
 
-    controlledByPlayer = true;
     facingDir = FacingDir.Right;
 
-    constructor(level: Level) {
+    keyRecorder: KeyRecorder | undefined;
+    keys: RegularKeys;
+
+    onFirstInput: (() => void) | undefined;
+
+    constructor(level: Level, keys: RegularKeys, recordInput: boolean = true) {
         super(level);
         // TODO: Set w and h
         this.w = physFromPx(5);
         this.h = physFromPx(5);
+
+        this.keys = keys;
+        if (recordInput) {
+            this.keyRecorder = new KeyRecorder();
+        }
     }
 
     getAnimationName() {
@@ -60,12 +70,11 @@ export class Player extends Entity {
 
         // TODO: Maybe checking what animation frame we're add and playing a sound effect (e.g. if it's a footstep frame.)
 
-        let keys = this.controlledByPlayer ? this.level.game.keys : new NullKeys();
-
-        const left = keys.anyIsPressed(LEFT_KEYS);
-        const right = keys.anyIsPressed(RIGHT_KEYS);
-        const up = keys.anyIsPressed(UP_KEYS);
-        const down = keys.anyIsPressed(DOWN_KEYS);
+        const left = this.keys.anyIsPressed(LEFT_KEYS);
+        const right = this.keys.anyIsPressed(RIGHT_KEYS);
+        const up = this.keys.anyIsPressed(UP_KEYS);
+        const down = this.keys.anyIsPressed(DOWN_KEYS);
+        const action = this.keys.anyIsPressed(ACTION_KEYS);
 
         // TODO: Record this somehow.
         // Also TODO: Damping to make this smooth.
@@ -95,8 +104,14 @@ export class Player extends Entity {
         this.moveY(dt);
 
         // Checking for winning
-        if (this.isTouchingTile(this.level.tiles.objectLayer, ObjectTile.Goal)) {
+        if (this.isOnTile(this.level.tiles.objectLayer, ObjectTile.Goal)) {
             this.level.win();
+        }
+
+        this.keyRecorder?.update(this.keys);
+
+        if (left || right || up || down || action) {
+            this.onFirstInput?.();
         }
     }
 

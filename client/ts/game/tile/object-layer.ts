@@ -6,14 +6,12 @@ export enum ObjectTile {
     Empty = 0,
     Spawn = 1,
     Goal = 2,
-    Platform = 3,
 }
 
 // Position of the tile in the tileset.
 const tilePositions: { [key in ObjectTile]?: Point } = {
-    [ObjectTile.Spawn]: { x: 6, y: 0 },
-    [ObjectTile.Goal]: { x: 7, y: 0 },
-    [ObjectTile.Platform]: { x: 6, y: 1 },
+    [ObjectTile.Spawn]: { x: 7, y: 0 },
+    [ObjectTile.Goal]: { x: 7, y: 1 },
 }
 
 export class ObjectLayer extends TileLayer<ObjectTile> {

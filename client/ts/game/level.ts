@@ -1,10 +1,13 @@
 import { Point } from "../common";
 import { Images } from "../lib/images";
+import { RegularKeys } from "../lib/keys";
 import { FocusCamera } from "./camera";
 import { Entity } from "./entity/entity";
 import { Player } from "./entity/player";
 import { Game } from "./game";
 import { LevelInfo } from "./levels";
+import { KeyHistory } from "./recordreplay/key-history";
+import { KeyReplayer } from "./recordreplay/key-replayer";
 import { BaseTile } from "./tile/base-layer";
 import { ObjectTile } from "./tile/object-layer";
 import { Tiles } from "./tile/tiles";
@@ -21,6 +24,8 @@ export class Level {
     tiles: Tiles = new Tiles(0, 0);
 
     start: Point = { x: 0, y: 0 };
+
+    keyReplayers: KeyReplayer[] = [];
 
     won = false;
 
@@ -66,10 +71,6 @@ export class Level {
                     this.tiles.objectLayer.setTile({ x, y }, ObjectTile.Spawn, { allowGrow: false });
                     this.tiles.baseLayer.setTile({ x, y }, BaseTile.Empty, { allowGrow: false });
                 }
-                else if (color === '0000ff') {
-                    this.tiles.objectLayer.setTile({ x, y }, ObjectTile.Platform, { allowGrow: false });
-                    this.tiles.baseLayer.setTile({ x, y }, BaseTile.Empty, { allowGrow: false });
-                }
                 else {
                     console.log(`Unknown color: ${color} at ${x}, ${y}.`);
                 }
@@ -78,16 +79,26 @@ export class Level {
 
         // this.camera.target = () => ({x: this.start.x, y: this.start.y});
 
-        this.spawnPlayer();
+        const player = this.spawnPlayer();
+        this.camera.target = () => player.cameraFocus();
+        player.onFirstInput = () => {
+            this.keyReplayers.forEach(replayer => replayer.start());
+        }
     }
 
-    spawnPlayer() {
-        const player = new Player(this);
+    spawnPlayer(keyHistory: KeyHistory | undefined = undefined) {
+        let keys: RegularKeys = this.game.keys;
+        if (keyHistory != undefined) {
+            const replayer = new KeyReplayer(keyHistory);
+            this.keyReplayers.push(replayer);
+            keys = replayer;
+        }
+        const player = new Player(this, keys, keyHistory == undefined);
         player.midX = this.start.x;
         player.maxY = this.start.y;
         this.entities.push(player);
 
-        this.camera.target = () => player.cameraFocus();
+        return player;
     }
 
     update(dt: number) {
@@ -103,6 +114,10 @@ export class Level {
 
         this.tiles.update(dt);
         this.camera.update(dt);
+
+        for (const keyReplayers of this.keyReplayers) {
+            keyReplayers.resetFrame();
+        }
     }
 
     render(context: CanvasRenderingContext2D) {

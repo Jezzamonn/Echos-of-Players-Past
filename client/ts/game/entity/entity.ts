@@ -115,6 +115,23 @@ export class Entity {
         return false
     }
 
+    isOnTile<T extends number>(tileSource: TileSource<T>, tile: T | T[], { dir = undefined, offset = undefined } : { dir?: Dir, offset?: Point } = {}): boolean {
+        if (!Array.isArray(tile)) {
+            tile = [tile];
+        }
+        const corners = Dirs.cornersInDirection(dir);
+        for (const corner of corners) {
+            const x = this.x + corner.x * this.w + (offset?.x ?? 0);
+            const y = this.y + corner.y * this.h + (offset?.y ?? 0);
+            for (const t of tile) {
+                if (tileSource.getTileAtCoord({x, y}) !== t) {
+                    return false;
+                }
+            }
+        }
+        return true
+    }
+
     isTouchingEntity(other: Entity): boolean {
         return this.maxX > other.minX && this.minX < other.maxX && this.maxY > other.minY && this.minY < other.maxY;
     }

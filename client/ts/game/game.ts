@@ -6,6 +6,7 @@ import { centerCanvas } from "./camera";
 import { Player } from "./entity/player";
 import { Level } from "./level";
 import { LEVELS, Levels } from "./levels";
+import { KeyRecorder } from "./recordreplay/key-recorder";
 import { SFX } from "./sfx";
 import { Tiles } from "./tile/tiles";
 
@@ -77,7 +78,24 @@ export class Game {
     }
 
     win() {
-        this.nextLevel();
+        // Debug thing to test that we can record input properly:
+        const oldHistorys = this.curLevel?.keyReplayers.map(r => r.keyHistory) ?? [];
+
+        // Get all the players
+        const players = this.curLevel?.entities.filter(e => e instanceof Player) as Player[];
+        const inputRecordings = players.map(p => p.keyRecorder).filter(r => r != undefined) as KeyRecorder[];
+
+        this.startLevel(this.levelIndex);
+
+        // Add players to the new level
+        for (const recording of inputRecordings) {
+            this.curLevel!.spawnPlayer(recording.keyHistory);
+        }
+        for (const history of oldHistorys) {
+            this.curLevel!.spawnPlayer(history);
+        }
+
+        // this.nextLevel();
     }
 
     doAnimationLoop() {

@@ -268,6 +268,22 @@ class Entity {
         }
         return false;
     }
+    isOnTile(tileSource, tile, { dir = undefined, offset = undefined } = {}) {
+        if (!Array.isArray(tile)) {
+            tile = [tile];
+        }
+        const corners = _common__WEBPACK_IMPORTED_MODULE_0__.Dirs.cornersInDirection(dir);
+        for (const corner of corners) {
+            const x = this.x + corner.x * this.w + (offset?.x ?? 0);
+            const y = this.y + corner.y * this.h + (offset?.y ?? 0);
+            for (const t of tile) {
+                if (tileSource.getTileAtCoord({ x, y }) !== t) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
     isTouchingEntity(other) {
         return this.maxX > other.minX && this.minX < other.maxX && this.maxY > other.minY && this.minY < other.maxY;
     }
@@ -333,7 +349,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _common__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../common */ "./ts/common.ts");
 /* harmony import */ var _constants__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../constants */ "./ts/constants.ts");
 /* harmony import */ var _lib_aseprite__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../lib/aseprite */ "./ts/lib/aseprite.ts");
-/* harmony import */ var _lib_keys__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../lib/keys */ "./ts/lib/keys.ts");
+/* harmony import */ var _recordreplay_key_recorder__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../recordreplay/key-recorder */ "./ts/game/recordreplay/key-recorder.ts");
 /* harmony import */ var _tile_object_layer__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../tile/object-layer */ "./ts/game/tile/object-layer.ts");
 /* harmony import */ var _entity__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./entity */ "./ts/game/entity/entity.ts");
 
@@ -344,14 +360,17 @@ __webpack_require__.r(__webpack_exports__);
 
 const imageName = 'characters';
 class Player extends _entity__WEBPACK_IMPORTED_MODULE_5__.Entity {
-    constructor(level) {
+    constructor(level, keys, recordInput = true) {
         super(level);
         this.runSpeed = 1 * _constants__WEBPACK_IMPORTED_MODULE_1__.PHYSICS_SCALE * _constants__WEBPACK_IMPORTED_MODULE_1__.FPS;
-        this.controlledByPlayer = true;
         this.facingDir = _common__WEBPACK_IMPORTED_MODULE_0__.FacingDir.Right;
         // TODO: Set w and h
         this.w = (0,_constants__WEBPACK_IMPORTED_MODULE_1__.physFromPx)(5);
         this.h = (0,_constants__WEBPACK_IMPORTED_MODULE_1__.physFromPx)(5);
+        this.keys = keys;
+        if (recordInput) {
+            this.keyRecorder = new _recordreplay_key_recorder__WEBPACK_IMPORTED_MODULE_3__.KeyRecorder();
+        }
     }
     getAnimationName() {
         let animName = 'idle';
@@ -382,11 +401,11 @@ class Player extends _entity__WEBPACK_IMPORTED_MODULE_5__.Entity {
     update(dt) {
         this.animCount += dt;
         // TODO: Maybe checking what animation frame we're add and playing a sound effect (e.g. if it's a footstep frame.)
-        let keys = this.controlledByPlayer ? this.level.game.keys : new _lib_keys__WEBPACK_IMPORTED_MODULE_3__.NullKeys();
-        const left = keys.anyIsPressed(_constants__WEBPACK_IMPORTED_MODULE_1__.LEFT_KEYS);
-        const right = keys.anyIsPressed(_constants__WEBPACK_IMPORTED_MODULE_1__.RIGHT_KEYS);
-        const up = keys.anyIsPressed(_constants__WEBPACK_IMPORTED_MODULE_1__.UP_KEYS);
-        const down = keys.anyIsPressed(_constants__WEBPACK_IMPORTED_MODULE_1__.DOWN_KEYS);
+        const left = this.keys.anyIsPressed(_constants__WEBPACK_IMPORTED_MODULE_1__.LEFT_KEYS);
+        const right = this.keys.anyIsPressed(_constants__WEBPACK_IMPORTED_MODULE_1__.RIGHT_KEYS);
+        const up = this.keys.anyIsPressed(_constants__WEBPACK_IMPORTED_MODULE_1__.UP_KEYS);
+        const down = this.keys.anyIsPressed(_constants__WEBPACK_IMPORTED_MODULE_1__.DOWN_KEYS);
+        const action = this.keys.anyIsPressed(_constants__WEBPACK_IMPORTED_MODULE_1__.ACTION_KEYS);
         // TODO: Record this somehow.
         // Also TODO: Damping to make this smooth.
         if (left && !right) {
@@ -412,8 +431,12 @@ class Player extends _entity__WEBPACK_IMPORTED_MODULE_5__.Entity {
         this.moveX(dt);
         this.moveY(dt);
         // Checking for winning
-        if (this.isTouchingTile(this.level.tiles.objectLayer, _tile_object_layer__WEBPACK_IMPORTED_MODULE_4__.ObjectTile.Goal)) {
+        if (this.isOnTile(this.level.tiles.objectLayer, _tile_object_layer__WEBPACK_IMPORTED_MODULE_4__.ObjectTile.Goal)) {
             this.level.win();
+        }
+        this.keyRecorder?.update(this.keys);
+        if (left || right || up || down || action) {
+            this.onFirstInput?.();
         }
     }
     static async preload() {
@@ -497,7 +520,20 @@ class Game {
         // }
     }
     win() {
-        this.nextLevel();
+        // Debug thing to test that we can record input properly:
+        const oldHistorys = this.curLevel?.keyReplayers.map(r => r.keyHistory) ?? [];
+        // Get all the players
+        const players = this.curLevel?.entities.filter(e => e instanceof _entity_player__WEBPACK_IMPORTED_MODULE_5__.Player);
+        const inputRecordings = players.map(p => p.keyRecorder).filter(r => r != undefined);
+        this.startLevel(this.levelIndex);
+        // Add players to the new level
+        for (const recording of inputRecordings) {
+            this.curLevel.spawnPlayer(recording.keyHistory);
+        }
+        for (const history of oldHistorys) {
+            this.curLevel.spawnPlayer(history);
+        }
+        // this.nextLevel();
     }
     doAnimationLoop() {
         if (this.simulatedTimeMs == undefined) {
@@ -614,9 +650,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _lib_images__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../lib/images */ "./ts/lib/images.ts");
 /* harmony import */ var _camera__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./camera */ "./ts/game/camera.ts");
 /* harmony import */ var _entity_player__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./entity/player */ "./ts/game/entity/player.ts");
-/* harmony import */ var _tile_base_layer__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./tile/base-layer */ "./ts/game/tile/base-layer.ts");
-/* harmony import */ var _tile_object_layer__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./tile/object-layer */ "./ts/game/tile/object-layer.ts");
-/* harmony import */ var _tile_tiles__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./tile/tiles */ "./ts/game/tile/tiles.ts");
+/* harmony import */ var _recordreplay_key_replayer__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./recordreplay/key-replayer */ "./ts/game/recordreplay/key-replayer.ts");
+/* harmony import */ var _tile_base_layer__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./tile/base-layer */ "./ts/game/tile/base-layer.ts");
+/* harmony import */ var _tile_object_layer__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./tile/object-layer */ "./ts/game/tile/object-layer.ts");
+/* harmony import */ var _tile_tiles__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./tile/tiles */ "./ts/game/tile/tiles.ts");
+
 
 
 
@@ -628,8 +666,9 @@ class Level {
     constructor(game, levelInfo) {
         this.entities = [];
         this.camera = new _camera__WEBPACK_IMPORTED_MODULE_1__.FocusCamera();
-        this.tiles = new _tile_tiles__WEBPACK_IMPORTED_MODULE_5__.Tiles(0, 0);
+        this.tiles = new _tile_tiles__WEBPACK_IMPORTED_MODULE_6__.Tiles(0, 0);
         this.start = { x: 0, y: 0 };
+        this.keyReplayers = [];
         this.won = false;
         this.game = game;
         this.levelInfo = levelInfo;
@@ -638,7 +677,7 @@ class Level {
         const image = _lib_images__WEBPACK_IMPORTED_MODULE_0__.Images.images[this.levelInfo.name].image;
         this.image = image;
         this.entities = [];
-        this.tiles = new _tile_tiles__WEBPACK_IMPORTED_MODULE_5__.Tiles(image.width, image.height);
+        this.tiles = new _tile_tiles__WEBPACK_IMPORTED_MODULE_6__.Tiles(image.width, image.height);
         // Draw the image to a canvas to get the pixels.
         const canvas = document.createElement('canvas');
         canvas.width = image.width;
@@ -654,23 +693,19 @@ class Level {
                     // Don't need to do anything for empty tiles as they're the default.
                 }
                 else if (color === '000000') {
-                    this.tiles.baseLayer.setTile({ x, y }, _tile_base_layer__WEBPACK_IMPORTED_MODULE_3__.BaseTile.Wall, { allowGrow: false });
+                    this.tiles.baseLayer.setTile({ x, y }, _tile_base_layer__WEBPACK_IMPORTED_MODULE_4__.BaseTile.Wall, { allowGrow: false });
                 }
                 else if (color === 'aaaaaa') {
-                    this.tiles.baseLayer.setTile({ x, y }, _tile_base_layer__WEBPACK_IMPORTED_MODULE_3__.BaseTile.Hole, { allowGrow: false });
+                    this.tiles.baseLayer.setTile({ x, y }, _tile_base_layer__WEBPACK_IMPORTED_MODULE_4__.BaseTile.Hole, { allowGrow: false });
                 }
                 else if (color === 'ffff00') {
-                    this.tiles.objectLayer.setTile({ x, y }, _tile_object_layer__WEBPACK_IMPORTED_MODULE_4__.ObjectTile.Goal, { allowGrow: false });
-                    this.tiles.baseLayer.setTile({ x, y }, _tile_base_layer__WEBPACK_IMPORTED_MODULE_3__.BaseTile.Empty, { allowGrow: false });
+                    this.tiles.objectLayer.setTile({ x, y }, _tile_object_layer__WEBPACK_IMPORTED_MODULE_5__.ObjectTile.Goal, { allowGrow: false });
+                    this.tiles.baseLayer.setTile({ x, y }, _tile_base_layer__WEBPACK_IMPORTED_MODULE_4__.BaseTile.Empty, { allowGrow: false });
                 }
                 else if (color === 'ff0000') {
                     this.start = this.tiles.getTileCoord({ x, y }, { x: 0.5, y: 0.5 });
-                    this.tiles.objectLayer.setTile({ x, y }, _tile_object_layer__WEBPACK_IMPORTED_MODULE_4__.ObjectTile.Spawn, { allowGrow: false });
-                    this.tiles.baseLayer.setTile({ x, y }, _tile_base_layer__WEBPACK_IMPORTED_MODULE_3__.BaseTile.Empty, { allowGrow: false });
-                }
-                else if (color === '0000ff') {
-                    this.tiles.objectLayer.setTile({ x, y }, _tile_object_layer__WEBPACK_IMPORTED_MODULE_4__.ObjectTile.Platform, { allowGrow: false });
-                    this.tiles.baseLayer.setTile({ x, y }, _tile_base_layer__WEBPACK_IMPORTED_MODULE_3__.BaseTile.Empty, { allowGrow: false });
+                    this.tiles.objectLayer.setTile({ x, y }, _tile_object_layer__WEBPACK_IMPORTED_MODULE_5__.ObjectTile.Spawn, { allowGrow: false });
+                    this.tiles.baseLayer.setTile({ x, y }, _tile_base_layer__WEBPACK_IMPORTED_MODULE_4__.BaseTile.Empty, { allowGrow: false });
                 }
                 else {
                     console.log(`Unknown color: ${color} at ${x}, ${y}.`);
@@ -678,14 +713,24 @@ class Level {
             }
         }
         // this.camera.target = () => ({x: this.start.x, y: this.start.y});
-        this.spawnPlayer();
+        const player = this.spawnPlayer();
+        this.camera.target = () => player.cameraFocus();
+        player.onFirstInput = () => {
+            this.keyReplayers.forEach(replayer => replayer.start());
+        };
     }
-    spawnPlayer() {
-        const player = new _entity_player__WEBPACK_IMPORTED_MODULE_2__.Player(this);
+    spawnPlayer(keyHistory = undefined) {
+        let keys = this.game.keys;
+        if (keyHistory != undefined) {
+            const replayer = new _recordreplay_key_replayer__WEBPACK_IMPORTED_MODULE_3__.KeyReplayer(keyHistory);
+            this.keyReplayers.push(replayer);
+            keys = replayer;
+        }
+        const player = new _entity_player__WEBPACK_IMPORTED_MODULE_2__.Player(this, keys, keyHistory == undefined);
         player.midX = this.start.x;
         player.maxY = this.start.y;
         this.entities.push(player);
-        this.camera.target = () => player.cameraFocus();
+        return player;
     }
     update(dt) {
         for (const entity of this.entities) {
@@ -698,6 +743,9 @@ class Level {
         }
         this.tiles.update(dt);
         this.camera.update(dt);
+        for (const keyReplayers of this.keyReplayers) {
+            keyReplayers.resetFrame();
+        }
     }
     render(context) {
         this.camera.applyTransform(context);
@@ -755,6 +803,128 @@ class Levels {
             }
         }
         return Promise.all(promises);
+    }
+}
+
+
+/***/ }),
+
+/***/ "./ts/game/recordreplay/key-recorder.ts":
+/*!**********************************************!*\
+  !*** ./ts/game/recordreplay/key-recorder.ts ***!
+  \**********************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   KeyRecorder: () => (/* binding */ KeyRecorder)
+/* harmony export */ });
+/* harmony import */ var _constants__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../constants */ "./ts/constants.ts");
+
+class KeyRecorder {
+    constructor() {
+        this.frameCount = 0;
+        this.gotSomeInput = false;
+        // [frame, keys pressed combined into a bitfield]
+        this.keyHistory = [];
+    }
+    update(keys) {
+        const left = keys.anyIsPressed(_constants__WEBPACK_IMPORTED_MODULE_0__.LEFT_KEYS);
+        const right = keys.anyIsPressed(_constants__WEBPACK_IMPORTED_MODULE_0__.RIGHT_KEYS);
+        const up = keys.anyIsPressed(_constants__WEBPACK_IMPORTED_MODULE_0__.UP_KEYS);
+        const down = keys.anyIsPressed(_constants__WEBPACK_IMPORTED_MODULE_0__.DOWN_KEYS);
+        const action = keys.anyIsPressed(_constants__WEBPACK_IMPORTED_MODULE_0__.ACTION_KEYS);
+        if (!this.gotSomeInput && !(left || right || up || down || action)) {
+            // Don't start recording until the first input.
+            return;
+        }
+        this.gotSomeInput = true;
+        let lastInput = 0;
+        if (this.keyHistory.length > 0) {
+            lastInput = this.keyHistory[this.keyHistory.length - 1][1];
+        }
+        const bitfield = (+left << 0) |
+            (+right << 1) |
+            (+up << 2) |
+            (+down << 3) |
+            (+action << 4);
+        if (bitfield != lastInput) {
+            this.keyHistory.push([this.frameCount, bitfield]);
+        }
+        this.frameCount++;
+    }
+}
+
+
+/***/ }),
+
+/***/ "./ts/game/recordreplay/key-replayer.ts":
+/*!**********************************************!*\
+  !*** ./ts/game/recordreplay/key-replayer.ts ***!
+  \**********************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   KeyReplayer: () => (/* binding */ KeyReplayer)
+/* harmony export */ });
+/* harmony import */ var _lib_keys__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../lib/keys */ "./ts/lib/keys.ts");
+
+const KEY_BIT_POSITIONS = {
+    'ArrowLeft': 0,
+    'ArrowRight': 1,
+    'ArrowUp': 2,
+    'ArrowDown': 3,
+    'Space': 4,
+};
+class KeyReplayer extends _lib_keys__WEBPACK_IMPORTED_MODULE_0__.RegularKeys {
+    constructor(keyHistory) {
+        super();
+        this.keyHistory = [];
+        this.historyIndex = 0;
+        this.frameCount = 0;
+        this.started = false;
+        this.currentBitfield = 0;
+        this.lastBitfield = 0;
+        this.keyHistory = keyHistory;
+    }
+    start() {
+        this.started = true;
+    }
+    isPressed(keyCode) {
+        if (KEY_BIT_POSITIONS[keyCode] === undefined) {
+            return false;
+        }
+        const bitPosition = KEY_BIT_POSITIONS[keyCode];
+        return (this.currentBitfield & (1 << bitPosition)) !== 0;
+    }
+    wasPressedThisFrame(keyCode) {
+        if (KEY_BIT_POSITIONS[keyCode] === undefined) {
+            return false;
+        }
+        const bitPosition = KEY_BIT_POSITIONS[keyCode];
+        return (this.currentBitfield & (1 << bitPosition)) !== 0 &&
+            (this.lastBitfield & (1 << bitPosition)) === 0;
+    }
+    wasReleasedThisFrame(keyCode) {
+        const bitPosition = KEY_BIT_POSITIONS[keyCode];
+        return (this.currentBitfield & (1 << bitPosition)) === 0 &&
+            (this.lastBitfield & (1 << bitPosition)) !== 0;
+    }
+    resetFrame() {
+        if (!this.started) {
+            return;
+        }
+        if (this.historyIndex >= this.keyHistory.length) {
+            return;
+        }
+        const [frame, bitfield] = this.keyHistory[this.historyIndex];
+        if (frame === this.frameCount) {
+            this.lastBitfield = this.currentBitfield;
+            this.currentBitfield = bitfield;
+            this.historyIndex++;
+        }
+        this.frameCount++;
     }
 }
 
@@ -925,13 +1095,11 @@ var ObjectTile;
     ObjectTile[ObjectTile["Empty"] = 0] = "Empty";
     ObjectTile[ObjectTile["Spawn"] = 1] = "Spawn";
     ObjectTile[ObjectTile["Goal"] = 2] = "Goal";
-    ObjectTile[ObjectTile["Platform"] = 3] = "Platform";
 })(ObjectTile || (ObjectTile = {}));
 // Position of the tile in the tileset.
 const tilePositions = {
-    [ObjectTile.Spawn]: { x: 6, y: 0 },
-    [ObjectTile.Goal]: { x: 7, y: 0 },
-    [ObjectTile.Platform]: { x: 6, y: 1 },
+    [ObjectTile.Spawn]: { x: 7, y: 0 },
+    [ObjectTile.Goal]: { x: 7, y: 1 },
 };
 class ObjectLayer extends _tile_layer__WEBPACK_IMPORTED_MODULE_1__.TileLayer {
     renderTile(context, pos) {
