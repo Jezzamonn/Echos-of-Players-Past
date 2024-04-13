@@ -1,0 +1,1 @@
+{"version":3,"file":"main.bundle.js","mappings":";;;;;;AAAa;AACb","sources":["webpack://ld55-client/./ts/client.ts"],"sourcesContent":["\"use strict\";\nconsole.log('Hello, world!');\n"],"names":[],"sourceRoot":""}
