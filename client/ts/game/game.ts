@@ -78,6 +78,12 @@ export class Game {
     }
 
     win() {
+        // TODO: Save player history for others to use.
+
+        this.nextLevel();
+    }
+
+    debugLoop() {
         // Debug thing to test that we can record input properly:
         const oldHistorys = this.curLevel?.keyReplayers.map(r => r.keyHistory) ?? [];
 
@@ -94,8 +100,6 @@ export class Game {
         for (const history of oldHistorys) {
             this.curLevel!.spawnPlayer(history);
         }
-
-        // this.nextLevel();
     }
 
     doAnimationLoop() {
@@ -135,7 +139,7 @@ export class Game {
             this.nextLevel();
         }
         if (this.keys.wasPressedThisFrame('KeyN')) {
-            this.win();
+            this.debugLoop();
         }
 
         if (this.keys.anyWasPressedThisFrame(RESTART_KEYS)) {
