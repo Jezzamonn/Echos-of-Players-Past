@@ -1,7 +1,7 @@
 import { Point } from "../../common";
 import { physFromPx, PHYSICS_SCALE } from "../../constants";
-import { Level } from "../level";
 import { Aseprite } from "../../lib/aseprite";
+import { Level } from "../level";
 import { Entity } from "./entity";
 
 export class Sprite extends Entity {
@@ -39,7 +39,7 @@ export class Sprite extends Entity {
     }
 
     render(context: CanvasRenderingContext2D) {
-        // context.fillRect(this.x, this.y, this.w, this.h);
+        context.fillRect(this.x, this.y, this.w, this.h);
         Aseprite.drawAnimation({
             context,
             image: this.name,

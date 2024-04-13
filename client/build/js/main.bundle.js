@@ -63,7 +63,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   GAME_HEIGHT_PX: () => (/* binding */ GAME_HEIGHT_PX),
 /* harmony export */   GAME_WIDTH: () => (/* binding */ GAME_WIDTH),
 /* harmony export */   GAME_WIDTH_PX: () => (/* binding */ GAME_WIDTH_PX),
-/* harmony export */   JUMP_KEYS: () => (/* binding */ JUMP_KEYS),
 /* harmony export */   LEFT_KEYS: () => (/* binding */ LEFT_KEYS),
 /* harmony export */   PHYSICS_SCALE: () => (/* binding */ PHYSICS_SCALE),
 /* harmony export */   PIXEL_SCALE: () => (/* binding */ PIXEL_SCALE),
@@ -74,6 +73,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   TILE_SIZE_PX: () => (/* binding */ TILE_SIZE_PX),
 /* harmony export */   TIME_STEP: () => (/* binding */ TIME_STEP),
 /* harmony export */   TITLE_KEYS: () => (/* binding */ TITLE_KEYS),
+/* harmony export */   UP_KEYS: () => (/* binding */ UP_KEYS),
 /* harmony export */   physFromPx: () => (/* binding */ physFromPx),
 /* harmony export */   pxFromPhys: () => (/* binding */ pxFromPhys),
 /* harmony export */   rng: () => (/* binding */ rng)
@@ -91,14 +91,14 @@ const GAME_WIDTH = GAME_WIDTH_PX * PHYSICS_SCALE;
 const GAME_HEIGHT = GAME_HEIGHT_PX * PHYSICS_SCALE;
 const TILE_SIZE_PX = 16;
 const TILE_SIZE = TILE_SIZE_PX * PHYSICS_SCALE;
-const LEFT_KEYS = ['KeyA', 'ArrowLeft', 'TouchButtonLeft'];
-const RIGHT_KEYS = ['KeyD', 'ArrowRight', 'TouchButtonRight'];
-const JUMP_KEYS = ['KeyW', 'ArrowUp', 'TouchButtonJump'];
-const DOWN_KEYS = ['KeyS', 'ArrowDown', 'TouchButtonDown'];
-const ACTION_KEYS = ['KeyE', 'Space', 'TouchButtonAction'];
-const SELECT_KEYS = ['Space', 'Enter', 'AnyTouch'];
-const TITLE_KEYS = ['Space', 'Enter', 'AnyTouch'];
-const RESTART_KEYS = ['KeyR', 'TouchButtonRestart'];
+const LEFT_KEYS = ['KeyA', 'ArrowLeft'];
+const RIGHT_KEYS = ['KeyD', 'ArrowRight'];
+const UP_KEYS = ['KeyW', 'ArrowUp'];
+const DOWN_KEYS = ['KeyS', 'ArrowDown'];
+const ACTION_KEYS = ['KeyE', 'Space'];
+const SELECT_KEYS = ['Space', 'Enter'];
+const TITLE_KEYS = ['Space', 'Enter'];
+const RESTART_KEYS = ['KeyR'];
 function physFromPx(x) {
     return x * PHYSICS_SCALE;
 }
@@ -294,9 +294,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   Entity: () => (/* binding */ Entity)
 /* harmony export */ });
 /* harmony import */ var _common__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../common */ "./ts/common.ts");
-/* harmony import */ var _constants__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../constants */ "./ts/constants.ts");
-/* harmony import */ var _tile_tiles__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../tile/tiles */ "./ts/game/tile/tiles.ts");
-
+/* harmony import */ var _tile_tiles__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../tile/tiles */ "./ts/game/tile/tiles.ts");
 
 
 class Entity {
@@ -307,11 +305,7 @@ class Entity {
         this.h = 0;
         this.dx = 0;
         this.dy = 0;
-        // Copying some constants from my previous games. Might need tweaking.
-        this.gravity = 0;
-        this.xDampAmt = (1 / 8) * _constants__WEBPACK_IMPORTED_MODULE_1__.PHYSICS_SCALE * _constants__WEBPACK_IMPORTED_MODULE_1__.FPS * _constants__WEBPACK_IMPORTED_MODULE_1__.FPS;
         this.animCount = 0;
-        this.facingDir = _common__WEBPACK_IMPORTED_MODULE_0__.FacingDir.Right;
         this.canCollide = true;
         this.done = false;
         this.debugColor = '#ff00ff';
@@ -319,25 +313,7 @@ class Entity {
     }
     update(dt) {
         this.animCount += dt;
-        this.applyGravity(dt);
-        this.dampX(dt);
         this.move(dt);
-    }
-    // Physics stuff
-    applyGravity(dt) {
-        this.dy += this.gravity * dt;
-    }
-    dampX(dt) {
-        const damp = this.xDampAmt * dt;
-        if (this.dx > damp) {
-            this.dx -= damp;
-        }
-        else if (this.dx < -damp) {
-            this.dx += damp;
-        }
-        else {
-            this.dx = 0;
-        }
     }
     move(dt) {
         this.moveX(dt);
@@ -350,33 +326,29 @@ class Entity {
             return;
         }
         if (this.dx < 0) {
-            if (this.isTouchingTile(this.level.tiles, _tile_tiles__WEBPACK_IMPORTED_MODULE_2__.PhysicTile.Wall, { dir: _common__WEBPACK_IMPORTED_MODULE_0__.Dir.Left })) {
+            if (this.isTouchingTile(this.level.tiles, _tile_tiles__WEBPACK_IMPORTED_MODULE_1__.PhysicTile.Wall, { dir: _common__WEBPACK_IMPORTED_MODULE_0__.Dir.Left })) {
                 this.onLeftCollision();
             }
         }
         else if (this.dx > 0) {
-            if (this.isTouchingTile(this.level.tiles, _tile_tiles__WEBPACK_IMPORTED_MODULE_2__.PhysicTile.Wall, { dir: _common__WEBPACK_IMPORTED_MODULE_0__.Dir.Right })) {
+            if (this.isTouchingTile(this.level.tiles, _tile_tiles__WEBPACK_IMPORTED_MODULE_1__.PhysicTile.Wall, { dir: _common__WEBPACK_IMPORTED_MODULE_0__.Dir.Right })) {
                 this.onRightCollision();
             }
         }
     }
     moveY(dt) {
-        const wasTouchingOneWayPlatform = this.isTouchingTile(this.level.tiles, _tile_tiles__WEBPACK_IMPORTED_MODULE_2__.PhysicTile.OneWayPlatform, { dir: _common__WEBPACK_IMPORTED_MODULE_0__.Dir.Down });
         this.y += this.dy * dt;
         this.y = Math.round(this.y);
         if (!this.canCollide) {
             return;
         }
         if (this.dy < 0) {
-            if (this.isTouchingTile(this.level.tiles, _tile_tiles__WEBPACK_IMPORTED_MODULE_2__.PhysicTile.Wall, { dir: _common__WEBPACK_IMPORTED_MODULE_0__.Dir.Up })) {
+            if (this.isTouchingTile(this.level.tiles, _tile_tiles__WEBPACK_IMPORTED_MODULE_1__.PhysicTile.Wall, { dir: _common__WEBPACK_IMPORTED_MODULE_0__.Dir.Up })) {
                 this.onUpCollision();
             }
         }
         else if (this.dy > 0) {
-            if (this.isTouchingTile(this.level.tiles, _tile_tiles__WEBPACK_IMPORTED_MODULE_2__.PhysicTile.Wall, { dir: _common__WEBPACK_IMPORTED_MODULE_0__.Dir.Down })) {
-                this.onDownCollision();
-            }
-            if (!wasTouchingOneWayPlatform && this.isTouchingTile(this.level.tiles, _tile_tiles__WEBPACK_IMPORTED_MODULE_2__.PhysicTile.OneWayPlatform, { dir: _common__WEBPACK_IMPORTED_MODULE_0__.Dir.Down })) {
+            if (this.isTouchingTile(this.level.tiles, _tile_tiles__WEBPACK_IMPORTED_MODULE_1__.PhysicTile.Wall, { dir: _common__WEBPACK_IMPORTED_MODULE_0__.Dir.Down })) {
                 this.onDownCollision();
             }
         }
@@ -416,10 +388,6 @@ class Entity {
             }
         }
         return false;
-    }
-    isStanding() {
-        return this.isTouchingTile(this.level.tiles, [_tile_tiles__WEBPACK_IMPORTED_MODULE_2__.PhysicTile.Wall, _tile_tiles__WEBPACK_IMPORTED_MODULE_2__.PhysicTile.OneWayPlatform], { dir: _common__WEBPACK_IMPORTED_MODULE_0__.Dir.Down, offset: { x: 0, y: 1 } }) &&
-            !this.isTouchingTile(this.level.tiles, _tile_tiles__WEBPACK_IMPORTED_MODULE_2__.PhysicTile.OneWayPlatform, { dir: _common__WEBPACK_IMPORTED_MODULE_0__.Dir.Down });
     }
     isTouchingEntity(other) {
         return this.maxX > other.minX && this.minX < other.maxX && this.maxY > other.minY && this.minY < other.maxY;
@@ -483,15 +451,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   Player: () => (/* binding */ Player)
 /* harmony export */ });
-/* harmony import */ var _common__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../common */ "./ts/common.ts");
-/* harmony import */ var _constants__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../constants */ "./ts/constants.ts");
-/* harmony import */ var _sfx__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../sfx */ "./ts/game/sfx.ts");
-/* harmony import */ var _lib_keys__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../lib/keys */ "./ts/lib/keys.ts");
+/* harmony import */ var _constants__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../constants */ "./ts/constants.ts");
+/* harmony import */ var _lib_aseprite__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../lib/aseprite */ "./ts/lib/aseprite.ts");
+/* harmony import */ var _lib_keys__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../lib/keys */ "./ts/lib/keys.ts");
+/* harmony import */ var _tile_object_layer__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../tile/object-layer */ "./ts/game/tile/object-layer.ts");
 /* harmony import */ var _entity__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./entity */ "./ts/game/entity/entity.ts");
-/* harmony import */ var _lib_aseprite__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../lib/aseprite */ "./ts/lib/aseprite.ts");
-/* harmony import */ var _tile_object_layer__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../tile/object-layer */ "./ts/game/tile/object-layer.ts");
-
-
 
 
 
@@ -501,111 +465,71 @@ const imageName = 'player';
 class Player extends _entity__WEBPACK_IMPORTED_MODULE_4__.Entity {
     constructor(level) {
         super(level);
-        this.runSpeed = 1.5 * _constants__WEBPACK_IMPORTED_MODULE_1__.PHYSICS_SCALE * _constants__WEBPACK_IMPORTED_MODULE_1__.FPS;
-        this.jumpSpeed = 3 * _constants__WEBPACK_IMPORTED_MODULE_1__.PHYSICS_SCALE * _constants__WEBPACK_IMPORTED_MODULE_1__.FPS;
+        this.runSpeed = 1.3 * _constants__WEBPACK_IMPORTED_MODULE_0__.PHYSICS_SCALE * _constants__WEBPACK_IMPORTED_MODULE_0__.FPS;
         this.controlledByPlayer = true;
         // TODO: Set w and h
-        this.w = (0,_constants__WEBPACK_IMPORTED_MODULE_1__.physFromPx)(6);
-        this.h = (0,_constants__WEBPACK_IMPORTED_MODULE_1__.physFromPx)(10);
-        // TODO: Tweak gravity? This was from Teeniest Seed.
-        this.gravity = 0.13 * _constants__WEBPACK_IMPORTED_MODULE_1__.PHYSICS_SCALE * _constants__WEBPACK_IMPORTED_MODULE_1__.FPS * _constants__WEBPACK_IMPORTED_MODULE_1__.FPS;
+        this.w = (0,_constants__WEBPACK_IMPORTED_MODULE_0__.physFromPx)(10);
+        this.h = (0,_constants__WEBPACK_IMPORTED_MODULE_0__.physFromPx)(10);
     }
     getAnimationName() {
         let animName = 'idle';
         let loop = true;
-        // TODO: This logic will probably need to be tweaked for whatever character this game has.
-        if (!this.isStanding()) {
-            animName = 'jump';
-            if (this.dy < -0.3 * this.jumpSpeed) {
-                animName += '-up';
-            }
-            else if (this.dy > 0.3 * this.jumpSpeed) {
-                animName += '-down';
-            }
-            else {
-                animName += '-mid';
-            }
-        }
-        else if (Math.abs(this.dx) > 0.01) {
-            animName = 'run';
-        }
         return { animName, loop };
     }
     render(context) {
-        // super.render(context);
+        super.render(context);
         const { animName, loop } = this.getAnimationName();
-        _lib_aseprite__WEBPACK_IMPORTED_MODULE_5__.Aseprite.drawAnimation({
+        _lib_aseprite__WEBPACK_IMPORTED_MODULE_1__.Aseprite.drawAnimation({
             context,
             image: "player",
             animationName: animName,
             time: this.animCount,
             position: { x: this.midX, y: this.maxY },
-            scale: _constants__WEBPACK_IMPORTED_MODULE_1__.PHYSICS_SCALE,
+            scale: _constants__WEBPACK_IMPORTED_MODULE_0__.PHYSICS_SCALE,
             anchorRatios: { x: 0.5, y: 1 },
-            // filter: filter,
-            flippedX: this.facingDir == _common__WEBPACK_IMPORTED_MODULE_0__.FacingDir.Left,
             loop,
         });
     }
     cameraFocus() {
-        // TODO: This made people dizzy, should adjust it / change the speed the camera moves.
-        const facingMult = this.facingDir == _common__WEBPACK_IMPORTED_MODULE_0__.FacingDir.Right ? 1 : -1;
-        return { x: this.midX + facingMult * (0,_constants__WEBPACK_IMPORTED_MODULE_1__.physFromPx)(30), y: this.maxY };
-    }
-    jump() {
-        this.dy = -this.jumpSpeed;
-        _sfx__WEBPACK_IMPORTED_MODULE_2__.SFX.play('jump');
-    }
-    // TODO: Some easing?
-    moveLeft(dt) {
-        this.dx = -this.runSpeed;
-        this.facingDir = _common__WEBPACK_IMPORTED_MODULE_0__.FacingDir.Left;
-    }
-    moveRight(dt) {
-        this.dx = this.runSpeed;
-        this.facingDir = _common__WEBPACK_IMPORTED_MODULE_0__.FacingDir.Right;
+        return { x: this.midX, y: this.maxY };
     }
     update(dt) {
         this.animCount += dt;
         // TODO: Maybe checking what animation frame we're add and playing a sound effect (e.g. if it's a footstep frame.)
-        let keys = this.controlledByPlayer ? this.level.game.keys : new _lib_keys__WEBPACK_IMPORTED_MODULE_3__.NullKeys();
-        if (this.isStanding() && keys.anyWasPressedThisFrame(_constants__WEBPACK_IMPORTED_MODULE_1__.JUMP_KEYS)) {
-            this.jump();
-        }
-        const left = keys.anyIsPressed(_constants__WEBPACK_IMPORTED_MODULE_1__.LEFT_KEYS);
-        const right = keys.anyIsPressed(_constants__WEBPACK_IMPORTED_MODULE_1__.RIGHT_KEYS);
+        let keys = this.controlledByPlayer ? this.level.game.keys : new _lib_keys__WEBPACK_IMPORTED_MODULE_2__.NullKeys();
+        const left = keys.anyIsPressed(_constants__WEBPACK_IMPORTED_MODULE_0__.LEFT_KEYS);
+        const right = keys.anyIsPressed(_constants__WEBPACK_IMPORTED_MODULE_0__.RIGHT_KEYS);
+        const up = keys.anyIsPressed(_constants__WEBPACK_IMPORTED_MODULE_0__.UP_KEYS);
+        const down = keys.anyIsPressed(_constants__WEBPACK_IMPORTED_MODULE_0__.DOWN_KEYS);
+        // TODO: Record this somehow.
+        // Also TODO: Damping to make this smooth.
         if (left && !right) {
-            this.moveLeft(dt);
+            this.dx = -this.runSpeed;
         }
         else if (right && !left) {
-            this.moveRight(dt);
+            this.dx = this.runSpeed;
         }
         else {
-            this.dampX(dt);
+            this.dx = 0;
         }
-        this.applyGravity(dt);
+        if (up && !down) {
+            this.dy = -this.runSpeed;
+        }
+        else if (down && !up) {
+            this.dy = this.runSpeed;
+        }
+        else {
+            this.dy = 0;
+        }
         this.moveX(dt);
         this.moveY(dt);
         // Checking for winning
-        if (this.isTouchingTile(this.level.tiles.objectLayer, _tile_object_layer__WEBPACK_IMPORTED_MODULE_6__.ObjectTile.Goal)) {
+        if (this.isTouchingTile(this.level.tiles.objectLayer, _tile_object_layer__WEBPACK_IMPORTED_MODULE_3__.ObjectTile.Goal)) {
             this.level.win();
         }
     }
-    applyGravity(dt) {
-        // if (!this.level.game.keys.anyIsPressed(JUMP_KEYS)) {
-        //     this.dy += 2 * this.gravity * dt;
-        //     return;
-        // }
-        this.dy += this.gravity * dt;
-    }
-    onDownCollision() {
-        if (this.dy > 0.5 * this.jumpSpeed) {
-            _sfx__WEBPACK_IMPORTED_MODULE_2__.SFX.play('land');
-        }
-        super.onDownCollision();
-    }
     static async preload() {
-        await _lib_aseprite__WEBPACK_IMPORTED_MODULE_5__.Aseprite.loadImage({ name: imageName, basePath: 'sprites' });
+        await _lib_aseprite__WEBPACK_IMPORTED_MODULE_1__.Aseprite.loadImage({ name: imageName, basePath: 'sprites' });
     }
 }
 
@@ -633,8 +557,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _levels__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./levels */ "./ts/game/levels.ts");
 /* harmony import */ var _sfx__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./sfx */ "./ts/game/sfx.ts");
 /* harmony import */ var _tile_tiles__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./tile/tiles */ "./ts/game/tile/tiles.ts");
-/* harmony import */ var _touch_keys__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./touch-keys */ "./ts/game/touch-keys.ts");
-
 
 
 
@@ -659,7 +581,7 @@ class Game {
         const context = canvas.getContext('2d');
         this.canvas = canvas;
         this.context = context;
-        this.keys = new _lib_keys__WEBPACK_IMPORTED_MODULE_2__.ComboKeys(new _lib_keys__WEBPACK_IMPORTED_MODULE_2__.KeyboardKeys(), new _touch_keys__WEBPACK_IMPORTED_MODULE_11__.TouchKeys());
+        this.keys = new _lib_keys__WEBPACK_IMPORTED_MODULE_2__.KeyboardKeys();
         _lib_sounds__WEBPACK_IMPORTED_MODULE_3__.Sounds.loadMuteState();
     }
     start() {
@@ -1399,189 +1321,6 @@ class Tiles {
         });
     }
 }
-
-
-/***/ }),
-
-/***/ "./ts/game/touch-keys.ts":
-/*!*******************************!*\
-  !*** ./ts/game/touch-keys.ts ***!
-  \*******************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   TouchKeys: () => (/* binding */ TouchKeys),
-/* harmony export */   UiState: () => (/* binding */ UiState)
-/* harmony export */ });
-/* harmony import */ var _lib_keys__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../lib/keys */ "./ts/lib/keys.ts");
-var __classPrivateFieldSet = (undefined && undefined.__classPrivateFieldSet) || function (receiver, state, value, kind, f) {
-    if (kind === "m") throw new TypeError("Private method is not writable");
-    if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a setter");
-    if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot write private member to an object whose class did not declare it");
-    return (kind === "a" ? f.call(receiver, value) : f ? f.value = value : state.set(receiver, value)), value;
-};
-var __classPrivateFieldGet = (undefined && undefined.__classPrivateFieldGet) || function (receiver, state, kind, f) {
-    if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a getter");
-    if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
-    return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
-};
-var _TouchKeys_pressedKeys, _TouchKeys_pressedThisFrame, _TouchKeys_releasedThisFrame, _TouchKeys_uiState, _TouchKeys_hadTouchEvent;
-
-var UiState;
-(function (UiState) {
-    UiState[UiState["Hidden"] = 0] = "Hidden";
-    UiState[UiState["Platforming"] = 1] = "Platforming";
-})(UiState || (UiState = {}));
-class TouchKeys extends _lib_keys__WEBPACK_IMPORTED_MODULE_0__.RegularKeys {
-    constructor() {
-        super(...arguments);
-        _TouchKeys_pressedKeys.set(this, new Set());
-        _TouchKeys_pressedThisFrame.set(this, new Set());
-        _TouchKeys_releasedThisFrame.set(this, new Set());
-        _TouchKeys_uiState.set(this, UiState.Platforming);
-        _TouchKeys_hadTouchEvent.set(this, false);
-    }
-    setUp() {
-        this.waitForFirstTouchEvent();
-    }
-    waitForFirstTouchEvent() {
-        const boundEnableTouchControls = () => {
-            this.enableTouchControls();
-            window.removeEventListener('touchstart', boundEnableTouchControls);
-        };
-        window.addEventListener('touchstart', boundEnableTouchControls);
-    }
-    enableTouchControls() {
-        __classPrivateFieldSet(this, _TouchKeys_hadTouchEvent, true, "f");
-        this.updateUiState();
-        this.addListeners();
-    }
-    setUiState(state) {
-        __classPrivateFieldSet(this, _TouchKeys_uiState, state, "f");
-        this.updateUiState();
-    }
-    updateUiState() {
-        if (!__classPrivateFieldGet(this, _TouchKeys_hadTouchEvent, "f")) {
-            return;
-        }
-        const buttons = document.querySelector('.touch-buttons');
-        switch (__classPrivateFieldGet(this, _TouchKeys_uiState, "f")) {
-            case UiState.Hidden:
-                buttons.classList.add('hidden');
-                break;
-            case UiState.Platforming:
-                buttons.classList.remove('hidden');
-                break;
-        }
-    }
-    addListeners() {
-        this.addMoveButtonListener('.touch-button-left-right', ['TouchButtonLeft', 'TouchButtonRight']);
-        this.addButtonListener('.touch-button-jump', 'TouchButtonJump');
-        this.addButtonListener('.touch-button-plant', 'TouchButtonPlant');
-        this.addButtonListener('.touch-button-restart', 'TouchButtonRestart');
-        // Also add a listener for the whole window.
-        this.addButtonListener(window, 'AnyTouch');
-    }
-    addButtonListener(elemOrSelector, keyCode) {
-        let elem;
-        if (typeof elemOrSelector === 'string') {
-            elem = document.querySelector(elemOrSelector);
-            if (!elem) {
-                console.error(`Can't find the touch target ${elem}. That's weird.`);
-                return;
-            }
-        }
-        else {
-            elem = elemOrSelector;
-        }
-        const updateFromTargetTargets = (evt) => {
-            if (evt.targetTouches.length > 0) {
-                if (!__classPrivateFieldGet(this, _TouchKeys_pressedKeys, "f").has(keyCode)) {
-                    __classPrivateFieldGet(this, _TouchKeys_pressedThisFrame, "f").add(keyCode);
-                    console.log('Pressed', keyCode);
-                }
-                __classPrivateFieldGet(this, _TouchKeys_pressedKeys, "f").add(keyCode);
-            }
-            else {
-                if (!__classPrivateFieldGet(this, _TouchKeys_pressedKeys, "f").has(keyCode)) {
-                    __classPrivateFieldGet(this, _TouchKeys_releasedThisFrame, "f").add(keyCode);
-                    console.log('Released', keyCode);
-                }
-                __classPrivateFieldGet(this, _TouchKeys_pressedKeys, "f").delete(keyCode);
-            }
-            evt.preventDefault();
-        };
-        console.log('Adding touch listeners to', elem, keyCode);
-        // TypeScript can't handle the types of these events, sadly.
-        elem.addEventListener('touchstart', updateFromTargetTargets, { passive: false });
-        elem.addEventListener('touchend', updateFromTargetTargets, { passive: false });
-        elem.addEventListener('touchcancel', updateFromTargetTargets, { passive: false });
-    }
-    // This could be made a bit more general.
-    addMoveButtonListener(elemOrSelector, keyCodes) {
-        let elem;
-        if (typeof elemOrSelector === 'string') {
-            elem = document.querySelector(elemOrSelector);
-            if (!elem) {
-                console.error(`Can't find the touch target ${elem}. That's weird.`);
-                return;
-            }
-        }
-        else {
-            elem = elemOrSelector;
-        }
-        const updateFromTargetTargets = (evt) => {
-            const bounds = elem.getBoundingClientRect();
-            const middle = (bounds.left + bounds.right) / 2;
-            const activeTouches = new Set();
-            for (let i = 0; i < evt.targetTouches.length; i++) {
-                const touch = evt.targetTouches.item(i);
-                if (touch.clientX < middle) {
-                    activeTouches.add(keyCodes[0]);
-                }
-                else {
-                    activeTouches.add(keyCodes[1]);
-                }
-            }
-            for (const keyCode of keyCodes) {
-                if (activeTouches.has(keyCode)) {
-                    if (!__classPrivateFieldGet(this, _TouchKeys_pressedKeys, "f").has(keyCode)) {
-                        __classPrivateFieldGet(this, _TouchKeys_pressedThisFrame, "f").add(keyCode);
-                        console.log('Pressed', keyCode);
-                    }
-                    __classPrivateFieldGet(this, _TouchKeys_pressedKeys, "f").add(keyCode);
-                }
-                else {
-                    if (!__classPrivateFieldGet(this, _TouchKeys_pressedKeys, "f").has(keyCode)) {
-                        __classPrivateFieldGet(this, _TouchKeys_releasedThisFrame, "f").add(keyCode);
-                        console.log('Released', keyCode);
-                    }
-                    __classPrivateFieldGet(this, _TouchKeys_pressedKeys, "f").delete(keyCode);
-                }
-            }
-        };
-        console.log('Adding touch listeners to', elem, keyCodes);
-        elem.addEventListener('touchstart', updateFromTargetTargets);
-        elem.addEventListener('touchmove', updateFromTargetTargets);
-        elem.addEventListener('touchend', updateFromTargetTargets);
-        elem.addEventListener('touchcancel', updateFromTargetTargets);
-    }
-    resetFrame() {
-        __classPrivateFieldGet(this, _TouchKeys_pressedThisFrame, "f").clear();
-        __classPrivateFieldGet(this, _TouchKeys_releasedThisFrame, "f").clear();
-    }
-    isPressed(keyCode) {
-        return __classPrivateFieldGet(this, _TouchKeys_pressedKeys, "f").has(keyCode);
-    }
-    wasPressedThisFrame(keyCode) {
-        return __classPrivateFieldGet(this, _TouchKeys_pressedThisFrame, "f").has(keyCode);
-    }
-    wasReleasedThisFrame(keyCode) {
-        return __classPrivateFieldGet(this, _TouchKeys_releasedThisFrame, "f").has(keyCode);
-    }
-}
-_TouchKeys_pressedKeys = new WeakMap(), _TouchKeys_pressedThisFrame = new WeakMap(), _TouchKeys_releasedThisFrame = new WeakMap(), _TouchKeys_uiState = new WeakMap(), _TouchKeys_hadTouchEvent = new WeakMap();
 
 
 /***/ }),

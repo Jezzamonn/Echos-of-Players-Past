@@ -1,54 +1,35 @@
-import { FacingDir, Point } from "../../common";
-import { FPS, JUMP_KEYS, LEFT_KEYS, physFromPx, PHYSICS_SCALE, RIGHT_KEYS } from "../../constants";
-import { Level } from "../level";
-import { SFX } from "../sfx";
-import { NullKeys } from "../../lib/keys";
-import { Entity } from "./entity";
+import { Point } from "../../common";
+import { DOWN_KEYS, FPS, LEFT_KEYS, PHYSICS_SCALE, RIGHT_KEYS, UP_KEYS, physFromPx } from "../../constants";
 import { Aseprite } from "../../lib/aseprite";
+import { NullKeys } from "../../lib/keys";
+import { Level } from "../level";
 import { ObjectTile } from "../tile/object-layer";
+import { Entity } from "./entity";
 
 const imageName = 'player';
 
 export class Player extends Entity {
 
-    runSpeed = 1.5 * PHYSICS_SCALE * FPS;
-    jumpSpeed = 3 * PHYSICS_SCALE * FPS;
+    runSpeed = 1.3 * PHYSICS_SCALE * FPS;
 
     controlledByPlayer = true;
 
     constructor(level: Level) {
         super(level);
         // TODO: Set w and h
-        this.w = physFromPx(6);
+        this.w = physFromPx(10);
         this.h = physFromPx(10);
-        // TODO: Tweak gravity? This was from Teeniest Seed.
-        this.gravity = 0.13 * PHYSICS_SCALE * FPS * FPS
     }
 
     getAnimationName() {
         let animName = 'idle';
         let loop = true;
 
-        // TODO: This logic will probably need to be tweaked for whatever character this game has.
-        if (!this.isStanding()) {
-            animName = 'jump';
-            if (this.dy < -0.3 * this.jumpSpeed) {
-                animName += '-up';
-            }
-            else if (this.dy > 0.3 * this.jumpSpeed) {
-                animName += '-down';
-            }
-            else {
-                animName += '-mid';
-            }
-        } else if (Math.abs(this.dx) > 0.01) {
-            animName = 'run';
-        }
         return { animName, loop }
     }
 
     render(context: CanvasRenderingContext2D) {
-        // super.render(context);
+        super.render(context);
 
         const {animName, loop} = this.getAnimationName();
 
@@ -60,32 +41,12 @@ export class Player extends Entity {
             position: {x: this.midX, y: this.maxY},
             scale: PHYSICS_SCALE,
             anchorRatios: {x: 0.5, y: 1},
-            // filter: filter,
-            flippedX: this.facingDir == FacingDir.Left,
             loop,
         });
     }
 
     cameraFocus(): Point {
-        // TODO: This made people dizzy, should adjust it / change the speed the camera moves.
-        const facingMult = this.facingDir == FacingDir.Right ? 1 : -1;
-        return { x: this.midX + facingMult * physFromPx(30), y: this.maxY };
-    }
-
-    jump() {
-        this.dy = -this.jumpSpeed;
-        SFX.play('jump');
-    }
-
-    // TODO: Some easing?
-    moveLeft(dt: number) {
-        this.dx = -this.runSpeed;
-        this.facingDir = FacingDir.Left;
-    }
-
-    moveRight(dt: number) {
-        this.dx = this.runSpeed;
-        this.facingDir = FacingDir.Right;
+        return { x: this.midX, y: this.maxY };
     }
 
     update(dt: number) {
@@ -95,23 +56,33 @@ export class Player extends Entity {
 
         let keys = this.controlledByPlayer ? this.level.game.keys : new NullKeys();
 
-        if (this.isStanding() && keys.anyWasPressedThisFrame(JUMP_KEYS)) {
-            this.jump();
-        }
-
         const left = keys.anyIsPressed(LEFT_KEYS);
         const right = keys.anyIsPressed(RIGHT_KEYS);
+        const up = keys.anyIsPressed(UP_KEYS);
+        const down = keys.anyIsPressed(DOWN_KEYS);
+
+        // TODO: Record this somehow.
+        // Also TODO: Damping to make this smooth.
         if (left && !right) {
-            this.moveLeft(dt);
+            this.dx = -this.runSpeed;
         }
         else if (right && !left) {
-            this.moveRight(dt);
+            this.dx = this.runSpeed;
         }
         else {
-            this.dampX(dt);
+            this.dx = 0;
         }
 
-        this.applyGravity(dt);
+        if (up && !down) {
+            this.dy = -this.runSpeed;
+        }
+        else if (down && !up) {
+            this.dy = this.runSpeed;
+        }
+        else {
+            this.dy = 0;
+        }
+
         this.moveX(dt);
         this.moveY(dt);
 
@@ -119,21 +90,6 @@ export class Player extends Entity {
         if (this.isTouchingTile(this.level.tiles.objectLayer, ObjectTile.Goal)) {
             this.level.win();
         }
-    }
-
-    applyGravity(dt: number): void {
-        // if (!this.level.game.keys.anyIsPressed(JUMP_KEYS)) {
-        //     this.dy += 2 * this.gravity * dt;
-        //     return;
-        // }
-        this.dy += this.gravity * dt;
-    }
-
-    onDownCollision() {
-        if (this.dy > 0.5 * this.jumpSpeed) {
-            SFX.play('land');
-        }
-        super.onDownCollision();
     }
 
     static async preload() {

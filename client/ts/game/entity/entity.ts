@@ -1,5 +1,4 @@
-import { Dir, Dirs, FacingDir, Point } from "../../common";
-import { FPS, PHYSICS_SCALE } from "../../constants";
+import { Dir, Dirs, Point } from "../../common";
 import { Level } from "../level";
 import { PhysicTile, TileSource } from "../tile/tiles";
 
@@ -12,11 +11,7 @@ export class Entity {
     h = 0;
     dx = 0;
     dy = 0;
-    // Copying some constants from my previous games. Might need tweaking.
-    gravity = 0;
-    xDampAmt = (1 / 8) * PHYSICS_SCALE * FPS * FPS;
     animCount = 0;
-    facingDir = FacingDir.Right;
     canCollide = true;
     done = false;
 
@@ -29,26 +24,7 @@ export class Entity {
     update(dt: number) {
         this.animCount += dt;
 
-        this.applyGravity(dt);
-        this.dampX(dt);
-
         this.move(dt);
-    }
-
-    // Physics stuff
-    applyGravity(dt: number) {
-        this.dy += this.gravity * dt;
-    }
-
-    dampX(dt: number) {
-        const damp = this.xDampAmt * dt;
-        if (this.dx > damp) {
-            this.dx -= damp;
-        } else if (this.dx < -damp) {
-            this.dx += damp;
-        } else {
-            this.dx = 0;
-        }
     }
 
     move(dt: number) {
@@ -58,7 +34,6 @@ export class Entity {
 
     moveX(dt: number) {
         this.x += this.dx * dt;
-
         this.x = Math.round(this.x);
 
         if (!this.canCollide) {
@@ -77,9 +52,7 @@ export class Entity {
     }
 
     moveY(dt: number) {
-        const wasTouchingOneWayPlatform = this.isTouchingTile(this.level.tiles, PhysicTile.OneWayPlatform, { dir: Dir.Down });
         this.y += this.dy * dt;
-
         this.y = Math.round(this.y);
 
         if (!this.canCollide) {
@@ -92,9 +65,6 @@ export class Entity {
             }
         } else if (this.dy > 0) {
             if (this.isTouchingTile(this.level.tiles, PhysicTile.Wall, { dir: Dir.Down })) {
-                this.onDownCollision();
-            }
-            if (!wasTouchingOneWayPlatform && this.isTouchingTile(this.level.tiles, PhysicTile.OneWayPlatform, { dir: Dir.Down })) {
                 this.onDownCollision();
             }
         }
@@ -143,11 +113,6 @@ export class Entity {
             }
         }
         return false
-    }
-
-    isStanding(): boolean {
-        return this.isTouchingTile(this.level.tiles, [PhysicTile.Wall, PhysicTile.OneWayPlatform], { dir: Dir.Down, offset: { x: 0, y: 1 } }) &&
-            !this.isTouchingTile(this.level.tiles, PhysicTile.OneWayPlatform, { dir: Dir.Down })
     }
 
     isTouchingEntity(other: Entity): boolean {
