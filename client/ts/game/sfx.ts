@@ -1,7 +1,8 @@
+// @ts-ignore
 import { sfxr } from "jsfxr";
 import { MuteState, Sounds } from "../lib/sounds";
 
-const sfx = {};
+const sfx: { [key: string]: any } = {};
 
 class _SFX {
     sounds: { [key: string]: any } = {};

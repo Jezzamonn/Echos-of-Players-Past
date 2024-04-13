@@ -18,7 +18,7 @@ export default {
         colors: true
     },
     mode: 'development',
-    entry: './ts/client.ts',
+    entry: './ts/main.ts',
     output: {
         path: path.resolve(__dirname, 'build/js'),
         filename: 'main.bundle.js'
