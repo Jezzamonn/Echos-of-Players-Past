@@ -1,7 +1,5 @@
 import { Point } from "../common";
-import { TILE_SIZE_PX } from "../constants";
 import { Images } from "../lib/images";
-import { Background } from "./background";
 import { FocusCamera } from "./camera";
 import { Entity } from "./entity/entity";
 import { Player } from "./entity/player";
@@ -19,7 +17,6 @@ export class Level {
     levelInfo: LevelInfo
 
     camera: FocusCamera = new FocusCamera();
-    background: Background | undefined;
 
     tiles: Tiles = new Tiles(0, 0);
 
@@ -38,11 +35,6 @@ export class Level {
         this.entities = [];
         this.tiles = new Tiles(image.width, image.height);
 
-        this.background = new Background(this, {
-            x: TILE_SIZE_PX * image.width / 2,
-            y: TILE_SIZE_PX * image.height / 2,
-        });
-
         // Draw the image to a canvas to get the pixels.
         const canvas = document.createElement('canvas');
         canvas.width = image.width;
@@ -55,8 +47,6 @@ export class Level {
         for (let y = 0; y < image.height; y++) {
             for (let x = 0; x < image.width; x++) {
 
-                const basePos = this.tiles.getTileCoord({x, y}, { x: 0.5, y: 1 })
-
                 const color = pixelToColorString(imageData, x, y);
                 if (color === 'ffffff') {
                     // Don't need to do anything for empty tiles as they're the default.
@@ -65,27 +55,26 @@ export class Level {
                     this.tiles.baseLayer.setTile({ x, y }, BaseTile.Wall, { allowGrow: false });
                 }
                 else if (color === 'aaaaaa') {
-                    this.tiles.baseLayer.setTile({ x, y }, BaseTile.Background, { allowGrow: false });
+                    this.tiles.baseLayer.setTile({ x, y }, BaseTile.Hole, { allowGrow: false });
                 }
                 else if (color === 'ffff00') {
                     this.tiles.objectLayer.setTile({ x, y }, ObjectTile.Goal, { allowGrow: false });
-                    this.tiles.baseLayer.setTile({ x, y }, BaseTile.Unknown, { allowGrow: false });
+                    this.tiles.baseLayer.setTile({ x, y }, BaseTile.Empty, { allowGrow: false });
                 }
                 else if (color === 'ff0000') {
-                    this.start = basePos;
+                    this.start = this.tiles.getTileCoord({x, y}, { x: 0.5, y: 0.5 });
                     this.tiles.objectLayer.setTile({ x, y }, ObjectTile.Spawn, { allowGrow: false });
-                    this.tiles.baseLayer.setTile({ x, y }, BaseTile.Unknown, { allowGrow: false });
+                    this.tiles.baseLayer.setTile({ x, y }, BaseTile.Empty, { allowGrow: false });
                 }
                 else if (color === '0000ff') {
                     this.tiles.objectLayer.setTile({ x, y }, ObjectTile.Platform, { allowGrow: false });
-                    this.tiles.baseLayer.setTile({ x, y }, BaseTile.Unknown, { allowGrow: false });
+                    this.tiles.baseLayer.setTile({ x, y }, BaseTile.Empty, { allowGrow: false });
                 }
                 else {
                     console.log(`Unknown color: ${color} at ${x}, ${y}.`);
                 }
             }
         }
-        this.tiles.baseLayer.fillInUnknownTiles();
 
         // this.camera.target = () => ({x: this.start.x, y: this.start.y});
 
@@ -112,15 +101,12 @@ export class Level {
             }
         }
 
-        this.background?.update(dt);
         this.tiles.update(dt);
         this.camera.update(dt);
     }
 
     render(context: CanvasRenderingContext2D) {
         this.camera.applyTransform(context);
-
-        this.background?.render(context);
 
         this.tiles.render(context);
 

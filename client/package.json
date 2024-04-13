@@ -9,7 +9,7 @@
     "watch": "npm-watch",
     "reload": "reload -b -d build",
     "static": "mkdir -p build/ && rsync -a --delete --exclude js/ --exclude sprites/ static/ build/",
-    "sprites": "mkdir -p build/sprites && rsync -a --delete --exclude '*.aseprite' sprites/ build/sprites/",
+    "sprites": "mkdir -p build/sprites && rsync -a --delete --exclude '*.aseprite' ../sprites/ build/sprites/",
     "webpack": "webpack",
     "webpack-prod": "webpack --mode production",
     "build": "npm-run-all --parallel webpack static",
@@ -25,7 +25,7 @@
     },
     "sprites": {
       "patterns": [
-        "sprites/**"
+        "../sprites/**"
       ],
       "extensions": "json,png,gif"
     },

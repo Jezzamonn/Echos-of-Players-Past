@@ -1,4 +1,4 @@
-import { Point } from "../../common";
+import { FacingDir, Point } from "../../common";
 import { DOWN_KEYS, FPS, LEFT_KEYS, PHYSICS_SCALE, RIGHT_KEYS, UP_KEYS, physFromPx } from "../../constants";
 import { Aseprite } from "../../lib/aseprite";
 import { NullKeys } from "../../lib/keys";
@@ -6,41 +6,47 @@ import { Level } from "../level";
 import { ObjectTile } from "../tile/object-layer";
 import { Entity } from "./entity";
 
-const imageName = 'player';
+const imageName = 'characters';
 
 export class Player extends Entity {
 
-    runSpeed = 1.3 * PHYSICS_SCALE * FPS;
+    runSpeed = 1 * PHYSICS_SCALE * FPS;
 
     controlledByPlayer = true;
+    facingDir = FacingDir.Right;
 
     constructor(level: Level) {
         super(level);
         // TODO: Set w and h
-        this.w = physFromPx(10);
-        this.h = physFromPx(10);
+        this.w = physFromPx(5);
+        this.h = physFromPx(5);
     }
 
     getAnimationName() {
         let animName = 'idle';
         let loop = true;
 
+        if (this.dx !== 0 || this.dy !== 0) {
+            animName = 'run';
+        }
+
         return { animName, loop }
     }
 
     render(context: CanvasRenderingContext2D) {
-        super.render(context);
+        // super.render(context);
 
         const {animName, loop} = this.getAnimationName();
 
         Aseprite.drawAnimation({
             context,
-            image: "player",
+            image: imageName,
             animationName: animName,
             time: this.animCount,
             position: {x: this.midX, y: this.maxY},
             scale: PHYSICS_SCALE,
             anchorRatios: {x: 0.5, y: 1},
+            flippedX: this.facingDir === FacingDir.Left,
             loop,
         });
     }
@@ -65,9 +71,11 @@ export class Player extends Entity {
         // Also TODO: Damping to make this smooth.
         if (left && !right) {
             this.dx = -this.runSpeed;
+            this.facingDir = FacingDir.Left;
         }
         else if (right && !left) {
             this.dx = this.runSpeed;
+            this.facingDir = FacingDir.Right;
         }
         else {
             this.dx = 0;

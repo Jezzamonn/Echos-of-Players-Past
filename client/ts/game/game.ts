@@ -2,7 +2,6 @@ import { GAME_HEIGHT_PX, GAME_WIDTH_PX, PHYSICS_SCALE, RESTART_KEYS, TIME_STEP }
 import { Aseprite } from "../lib/aseprite";
 import { KeyboardKeys, NullKeys, RegularKeys } from "../lib/keys";
 import { Sounds } from "../lib/sounds";
-import { Background } from "./background";
 import { centerCanvas } from "./camera";
 import { Player } from "./entity/player";
 import { Level } from "./level";
@@ -196,7 +195,6 @@ export class Game {
             Levels.preload(),
             Tiles.preload(),
             Player.preload(),
-            Background.preload(),
         ]);
         SFX.preload();
     }

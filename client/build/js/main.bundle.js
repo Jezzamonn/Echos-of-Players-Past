@@ -111,127 +111,6 @@ const rng = (0,_lib_util__WEBPACK_IMPORTED_MODULE_0__.seededRandom)("hahahahahih
 
 /***/ }),
 
-/***/ "./ts/game/background.ts":
-/*!*******************************!*\
-  !*** ./ts/game/background.ts ***!
-  \*******************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   Background: () => (/* binding */ Background)
-/* harmony export */ });
-/* harmony import */ var _constants__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../constants */ "./ts/constants.ts");
-/* harmony import */ var _lib_images__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../lib/images */ "./ts/lib/images.ts");
-/* harmony import */ var _camera__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./camera */ "./ts/game/camera.ts");
-
-
-
-const BG_LAYERS = [
-    {
-        image: "background",
-        scale: 0.05,
-        offset: {
-            x: 0,
-            y: -20,
-        },
-    },
-    {
-        color: "#c0cbdc",
-    },
-];
-class Background {
-    constructor(level, offset) {
-        this.layers = [];
-        this.level = level;
-        this.offset = offset;
-        for (const layer of BG_LAYERS) {
-            if ("image" in layer) {
-                this.layers.push(new ImageLayer({
-                    background: this,
-                    image: layer.image,
-                    scale: layer.scale,
-                    offset: layer.offset,
-                }));
-            }
-            else {
-                this.layers.push(new FillLayer({
-                    color: layer.color,
-                }));
-            }
-        }
-    }
-    update(dt) {
-        for (const layer of this.layers) {
-            layer.update(dt);
-        }
-    }
-    render(context) {
-        for (const layer of this.layers) {
-            layer.render(context);
-        }
-    }
-    static async preload() {
-        const promises = [];
-        for (const layer of BG_LAYERS) {
-            if ("image" in layer) {
-                promises.push(_lib_images__WEBPACK_IMPORTED_MODULE_1__.Images.loadImage({ name: layer.image, path: "sprites/" }));
-            }
-        }
-        await Promise.all(promises);
-    }
-}
-class FillLayer {
-    constructor({ color }) {
-        this.color = color;
-    }
-    update(dt) { }
-    render(context) {
-        // Clear transform
-        context.save();
-        context.resetTransform();
-        context.fillStyle = this.color;
-        context.fillRect(0, 0, context.canvas.width, context.canvas.height);
-        context.restore();
-    }
-}
-class ImageLayer {
-    constructor({ background, image, scale, offset = { x: 0, y: 0 }, }) {
-        this.animCount = 0;
-        this.image = "";
-        this.scale = 1;
-        this.background = background;
-        this.image = image;
-        this.scale = scale;
-        this.offset = offset;
-    }
-    update(dt) {
-        this.animCount += dt;
-    }
-    render(context) {
-        // TODO: Apply scale.
-        context.save();
-        context.resetTransform();
-        (0,_camera__WEBPACK_IMPORTED_MODULE_2__.centerCanvas)(context);
-        // This part of the code could be better so it's not reaching into the
-        // other parts of the code base as much. Probably requires refactoring
-        // of some camera stuff.
-        this.background.level.game.applyScale(context);
-        this.background.level.camera.applyTransform(context, this.scale);
-        // const isCloud = this.image.startsWith("bg-clouds");
-        // let windOffset = 0;
-        // if (isCloud) {
-        //     windOffset = 30 * this.scale * this.animCount;
-        // }
-        const image = _lib_images__WEBPACK_IMPORTED_MODULE_1__.Images.images[this.image].image;
-        context.drawImage(image, (0,_constants__WEBPACK_IMPORTED_MODULE_0__.physFromPx)(this.offset.x - image.width / 2 + this.scale * this.background.offset.x), (0,_constants__WEBPACK_IMPORTED_MODULE_0__.physFromPx)(this.offset.y - image.height / 2 + this.scale * this.background.offset.y), (0,_constants__WEBPACK_IMPORTED_MODULE_0__.physFromPx)(image.width), (0,_constants__WEBPACK_IMPORTED_MODULE_0__.physFromPx)(image.height));
-        context.restore();
-    }
-}
-
-
-/***/ }),
-
 /***/ "./ts/game/camera.ts":
 /*!***************************!*\
   !*** ./ts/game/camera.ts ***!
@@ -265,7 +144,7 @@ class FocusCamera extends Camera {
             this.curPos = targetPos;
             return;
         }
-        const updateSmoothness = 1 - Math.exp(-3 * dt);
+        const updateSmoothness = 1 - Math.exp(-2 * dt);
         this.curPos.x = (0,_lib_util__WEBPACK_IMPORTED_MODULE_0__.lerp)(this.curPos.x, targetPos.x, updateSmoothness);
         this.curPos.y = (0,_lib_util__WEBPACK_IMPORTED_MODULE_0__.lerp)(this.curPos.y, targetPos.y, updateSmoothness);
     }
@@ -451,42 +330,49 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   Player: () => (/* binding */ Player)
 /* harmony export */ });
-/* harmony import */ var _constants__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../constants */ "./ts/constants.ts");
-/* harmony import */ var _lib_aseprite__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../lib/aseprite */ "./ts/lib/aseprite.ts");
-/* harmony import */ var _lib_keys__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../lib/keys */ "./ts/lib/keys.ts");
-/* harmony import */ var _tile_object_layer__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../tile/object-layer */ "./ts/game/tile/object-layer.ts");
-/* harmony import */ var _entity__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./entity */ "./ts/game/entity/entity.ts");
+/* harmony import */ var _common__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../common */ "./ts/common.ts");
+/* harmony import */ var _constants__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../constants */ "./ts/constants.ts");
+/* harmony import */ var _lib_aseprite__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../lib/aseprite */ "./ts/lib/aseprite.ts");
+/* harmony import */ var _lib_keys__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../lib/keys */ "./ts/lib/keys.ts");
+/* harmony import */ var _tile_object_layer__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../tile/object-layer */ "./ts/game/tile/object-layer.ts");
+/* harmony import */ var _entity__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./entity */ "./ts/game/entity/entity.ts");
 
 
 
 
 
-const imageName = 'player';
-class Player extends _entity__WEBPACK_IMPORTED_MODULE_4__.Entity {
+
+const imageName = 'characters';
+class Player extends _entity__WEBPACK_IMPORTED_MODULE_5__.Entity {
     constructor(level) {
         super(level);
-        this.runSpeed = 1.3 * _constants__WEBPACK_IMPORTED_MODULE_0__.PHYSICS_SCALE * _constants__WEBPACK_IMPORTED_MODULE_0__.FPS;
+        this.runSpeed = 1 * _constants__WEBPACK_IMPORTED_MODULE_1__.PHYSICS_SCALE * _constants__WEBPACK_IMPORTED_MODULE_1__.FPS;
         this.controlledByPlayer = true;
+        this.facingDir = _common__WEBPACK_IMPORTED_MODULE_0__.FacingDir.Right;
         // TODO: Set w and h
-        this.w = (0,_constants__WEBPACK_IMPORTED_MODULE_0__.physFromPx)(10);
-        this.h = (0,_constants__WEBPACK_IMPORTED_MODULE_0__.physFromPx)(10);
+        this.w = (0,_constants__WEBPACK_IMPORTED_MODULE_1__.physFromPx)(5);
+        this.h = (0,_constants__WEBPACK_IMPORTED_MODULE_1__.physFromPx)(5);
     }
     getAnimationName() {
         let animName = 'idle';
         let loop = true;
+        if (this.dx !== 0 || this.dy !== 0) {
+            animName = 'run';
+        }
         return { animName, loop };
     }
     render(context) {
-        super.render(context);
+        // super.render(context);
         const { animName, loop } = this.getAnimationName();
-        _lib_aseprite__WEBPACK_IMPORTED_MODULE_1__.Aseprite.drawAnimation({
+        _lib_aseprite__WEBPACK_IMPORTED_MODULE_2__.Aseprite.drawAnimation({
             context,
-            image: "player",
+            image: imageName,
             animationName: animName,
             time: this.animCount,
             position: { x: this.midX, y: this.maxY },
-            scale: _constants__WEBPACK_IMPORTED_MODULE_0__.PHYSICS_SCALE,
+            scale: _constants__WEBPACK_IMPORTED_MODULE_1__.PHYSICS_SCALE,
             anchorRatios: { x: 0.5, y: 1 },
+            flippedX: this.facingDir === _common__WEBPACK_IMPORTED_MODULE_0__.FacingDir.Left,
             loop,
         });
     }
@@ -496,18 +382,20 @@ class Player extends _entity__WEBPACK_IMPORTED_MODULE_4__.Entity {
     update(dt) {
         this.animCount += dt;
         // TODO: Maybe checking what animation frame we're add and playing a sound effect (e.g. if it's a footstep frame.)
-        let keys = this.controlledByPlayer ? this.level.game.keys : new _lib_keys__WEBPACK_IMPORTED_MODULE_2__.NullKeys();
-        const left = keys.anyIsPressed(_constants__WEBPACK_IMPORTED_MODULE_0__.LEFT_KEYS);
-        const right = keys.anyIsPressed(_constants__WEBPACK_IMPORTED_MODULE_0__.RIGHT_KEYS);
-        const up = keys.anyIsPressed(_constants__WEBPACK_IMPORTED_MODULE_0__.UP_KEYS);
-        const down = keys.anyIsPressed(_constants__WEBPACK_IMPORTED_MODULE_0__.DOWN_KEYS);
+        let keys = this.controlledByPlayer ? this.level.game.keys : new _lib_keys__WEBPACK_IMPORTED_MODULE_3__.NullKeys();
+        const left = keys.anyIsPressed(_constants__WEBPACK_IMPORTED_MODULE_1__.LEFT_KEYS);
+        const right = keys.anyIsPressed(_constants__WEBPACK_IMPORTED_MODULE_1__.RIGHT_KEYS);
+        const up = keys.anyIsPressed(_constants__WEBPACK_IMPORTED_MODULE_1__.UP_KEYS);
+        const down = keys.anyIsPressed(_constants__WEBPACK_IMPORTED_MODULE_1__.DOWN_KEYS);
         // TODO: Record this somehow.
         // Also TODO: Damping to make this smooth.
         if (left && !right) {
             this.dx = -this.runSpeed;
+            this.facingDir = _common__WEBPACK_IMPORTED_MODULE_0__.FacingDir.Left;
         }
         else if (right && !left) {
             this.dx = this.runSpeed;
+            this.facingDir = _common__WEBPACK_IMPORTED_MODULE_0__.FacingDir.Right;
         }
         else {
             this.dx = 0;
@@ -524,12 +412,12 @@ class Player extends _entity__WEBPACK_IMPORTED_MODULE_4__.Entity {
         this.moveX(dt);
         this.moveY(dt);
         // Checking for winning
-        if (this.isTouchingTile(this.level.tiles.objectLayer, _tile_object_layer__WEBPACK_IMPORTED_MODULE_3__.ObjectTile.Goal)) {
+        if (this.isTouchingTile(this.level.tiles.objectLayer, _tile_object_layer__WEBPACK_IMPORTED_MODULE_4__.ObjectTile.Goal)) {
             this.level.win();
         }
     }
     static async preload() {
-        await _lib_aseprite__WEBPACK_IMPORTED_MODULE_1__.Aseprite.loadImage({ name: imageName, basePath: 'sprites' });
+        await _lib_aseprite__WEBPACK_IMPORTED_MODULE_2__.Aseprite.loadImage({ name: imageName, basePath: 'sprites' });
     }
 }
 
@@ -550,14 +438,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _lib_aseprite__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../lib/aseprite */ "./ts/lib/aseprite.ts");
 /* harmony import */ var _lib_keys__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../lib/keys */ "./ts/lib/keys.ts");
 /* harmony import */ var _lib_sounds__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../lib/sounds */ "./ts/lib/sounds.ts");
-/* harmony import */ var _background__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./background */ "./ts/game/background.ts");
-/* harmony import */ var _camera__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./camera */ "./ts/game/camera.ts");
-/* harmony import */ var _entity_player__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./entity/player */ "./ts/game/entity/player.ts");
-/* harmony import */ var _level__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./level */ "./ts/game/level.ts");
-/* harmony import */ var _levels__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./levels */ "./ts/game/levels.ts");
-/* harmony import */ var _sfx__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./sfx */ "./ts/game/sfx.ts");
-/* harmony import */ var _tile_tiles__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./tile/tiles */ "./ts/game/tile/tiles.ts");
-
+/* harmony import */ var _camera__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./camera */ "./ts/game/camera.ts");
+/* harmony import */ var _entity_player__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./entity/player */ "./ts/game/entity/player.ts");
+/* harmony import */ var _level__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./level */ "./ts/game/level.ts");
+/* harmony import */ var _levels__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./levels */ "./ts/game/levels.ts");
+/* harmony import */ var _sfx__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./sfx */ "./ts/game/sfx.ts");
+/* harmony import */ var _tile_tiles__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./tile/tiles */ "./ts/game/tile/tiles.ts");
 
 
 
@@ -595,15 +481,15 @@ class Game {
         this.startLevel(0);
     }
     nextLevel() {
-        this.startLevel((this.levelIndex + 1) % _levels__WEBPACK_IMPORTED_MODULE_8__.LEVELS.length);
+        this.startLevel((this.levelIndex + 1) % _levels__WEBPACK_IMPORTED_MODULE_7__.LEVELS.length);
     }
     prevLevel() {
-        this.startLevel((this.levelIndex + _levels__WEBPACK_IMPORTED_MODULE_8__.LEVELS.length - 1) % _levels__WEBPACK_IMPORTED_MODULE_8__.LEVELS.length);
+        this.startLevel((this.levelIndex + _levels__WEBPACK_IMPORTED_MODULE_7__.LEVELS.length - 1) % _levels__WEBPACK_IMPORTED_MODULE_7__.LEVELS.length);
     }
     startLevel(levelIndex) {
         this.levelIndex = levelIndex;
-        const levelInfo = _levels__WEBPACK_IMPORTED_MODULE_8__.LEVELS[this.levelIndex];
-        const level = new _level__WEBPACK_IMPORTED_MODULE_7__.Level(this, levelInfo);
+        const levelInfo = _levels__WEBPACK_IMPORTED_MODULE_7__.LEVELS[this.levelIndex];
+        const level = new _level__WEBPACK_IMPORTED_MODULE_6__.Level(this, levelInfo);
         level.initFromImage();
         this.curLevel = level;
         // if (levelInfo.song) {
@@ -662,7 +548,7 @@ class Game {
     }
     render() {
         this.context.resetTransform();
-        (0,_camera__WEBPACK_IMPORTED_MODULE_5__.centerCanvas)(this.context);
+        (0,_camera__WEBPACK_IMPORTED_MODULE_4__.centerCanvas)(this.context);
         this.applyScale(this.context);
         try {
             this.curLevel?.render(this.context);
@@ -704,12 +590,11 @@ class Game {
     }
     static async preload() {
         await Promise.all([
-            _levels__WEBPACK_IMPORTED_MODULE_8__.Levels.preload(),
-            _tile_tiles__WEBPACK_IMPORTED_MODULE_10__.Tiles.preload(),
-            _entity_player__WEBPACK_IMPORTED_MODULE_6__.Player.preload(),
-            _background__WEBPACK_IMPORTED_MODULE_4__.Background.preload(),
+            _levels__WEBPACK_IMPORTED_MODULE_7__.Levels.preload(),
+            _tile_tiles__WEBPACK_IMPORTED_MODULE_9__.Tiles.preload(),
+            _entity_player__WEBPACK_IMPORTED_MODULE_5__.Player.preload(),
         ]);
-        _sfx__WEBPACK_IMPORTED_MODULE_9__.SFX.preload();
+        _sfx__WEBPACK_IMPORTED_MODULE_8__.SFX.preload();
     }
 }
 
@@ -726,16 +611,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   Level: () => (/* binding */ Level)
 /* harmony export */ });
-/* harmony import */ var _constants__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../constants */ "./ts/constants.ts");
-/* harmony import */ var _lib_images__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../lib/images */ "./ts/lib/images.ts");
-/* harmony import */ var _background__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./background */ "./ts/game/background.ts");
-/* harmony import */ var _camera__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./camera */ "./ts/game/camera.ts");
-/* harmony import */ var _entity_player__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./entity/player */ "./ts/game/entity/player.ts");
-/* harmony import */ var _tile_base_layer__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./tile/base-layer */ "./ts/game/tile/base-layer.ts");
-/* harmony import */ var _tile_object_layer__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./tile/object-layer */ "./ts/game/tile/object-layer.ts");
-/* harmony import */ var _tile_tiles__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./tile/tiles */ "./ts/game/tile/tiles.ts");
-
-
+/* harmony import */ var _lib_images__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../lib/images */ "./ts/lib/images.ts");
+/* harmony import */ var _camera__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./camera */ "./ts/game/camera.ts");
+/* harmony import */ var _entity_player__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./entity/player */ "./ts/game/entity/player.ts");
+/* harmony import */ var _tile_base_layer__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./tile/base-layer */ "./ts/game/tile/base-layer.ts");
+/* harmony import */ var _tile_object_layer__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./tile/object-layer */ "./ts/game/tile/object-layer.ts");
+/* harmony import */ var _tile_tiles__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./tile/tiles */ "./ts/game/tile/tiles.ts");
 
 
 
@@ -746,22 +627,18 @@ __webpack_require__.r(__webpack_exports__);
 class Level {
     constructor(game, levelInfo) {
         this.entities = [];
-        this.camera = new _camera__WEBPACK_IMPORTED_MODULE_3__.FocusCamera();
-        this.tiles = new _tile_tiles__WEBPACK_IMPORTED_MODULE_7__.Tiles(0, 0);
+        this.camera = new _camera__WEBPACK_IMPORTED_MODULE_1__.FocusCamera();
+        this.tiles = new _tile_tiles__WEBPACK_IMPORTED_MODULE_5__.Tiles(0, 0);
         this.start = { x: 0, y: 0 };
         this.won = false;
         this.game = game;
         this.levelInfo = levelInfo;
     }
     initFromImage() {
-        const image = _lib_images__WEBPACK_IMPORTED_MODULE_1__.Images.images[this.levelInfo.name].image;
+        const image = _lib_images__WEBPACK_IMPORTED_MODULE_0__.Images.images[this.levelInfo.name].image;
         this.image = image;
         this.entities = [];
-        this.tiles = new _tile_tiles__WEBPACK_IMPORTED_MODULE_7__.Tiles(image.width, image.height);
-        this.background = new _background__WEBPACK_IMPORTED_MODULE_2__.Background(this, {
-            x: _constants__WEBPACK_IMPORTED_MODULE_0__.TILE_SIZE_PX * image.width / 2,
-            y: _constants__WEBPACK_IMPORTED_MODULE_0__.TILE_SIZE_PX * image.height / 2,
-        });
+        this.tiles = new _tile_tiles__WEBPACK_IMPORTED_MODULE_5__.Tiles(image.width, image.height);
         // Draw the image to a canvas to get the pixels.
         const canvas = document.createElement('canvas');
         canvas.width = image.width;
@@ -772,41 +649,39 @@ class Level {
         const imageData = context.getImageData(0, 0, image.width, image.height);
         for (let y = 0; y < image.height; y++) {
             for (let x = 0; x < image.width; x++) {
-                const basePos = this.tiles.getTileCoord({ x, y }, { x: 0.5, y: 1 });
                 const color = pixelToColorString(imageData, x, y);
                 if (color === 'ffffff') {
                     // Don't need to do anything for empty tiles as they're the default.
                 }
                 else if (color === '000000') {
-                    this.tiles.baseLayer.setTile({ x, y }, _tile_base_layer__WEBPACK_IMPORTED_MODULE_5__.BaseTile.Wall, { allowGrow: false });
+                    this.tiles.baseLayer.setTile({ x, y }, _tile_base_layer__WEBPACK_IMPORTED_MODULE_3__.BaseTile.Wall, { allowGrow: false });
                 }
                 else if (color === 'aaaaaa') {
-                    this.tiles.baseLayer.setTile({ x, y }, _tile_base_layer__WEBPACK_IMPORTED_MODULE_5__.BaseTile.Background, { allowGrow: false });
+                    this.tiles.baseLayer.setTile({ x, y }, _tile_base_layer__WEBPACK_IMPORTED_MODULE_3__.BaseTile.Hole, { allowGrow: false });
                 }
                 else if (color === 'ffff00') {
-                    this.tiles.objectLayer.setTile({ x, y }, _tile_object_layer__WEBPACK_IMPORTED_MODULE_6__.ObjectTile.Goal, { allowGrow: false });
-                    this.tiles.baseLayer.setTile({ x, y }, _tile_base_layer__WEBPACK_IMPORTED_MODULE_5__.BaseTile.Unknown, { allowGrow: false });
+                    this.tiles.objectLayer.setTile({ x, y }, _tile_object_layer__WEBPACK_IMPORTED_MODULE_4__.ObjectTile.Goal, { allowGrow: false });
+                    this.tiles.baseLayer.setTile({ x, y }, _tile_base_layer__WEBPACK_IMPORTED_MODULE_3__.BaseTile.Empty, { allowGrow: false });
                 }
                 else if (color === 'ff0000') {
-                    this.start = basePos;
-                    this.tiles.objectLayer.setTile({ x, y }, _tile_object_layer__WEBPACK_IMPORTED_MODULE_6__.ObjectTile.Spawn, { allowGrow: false });
-                    this.tiles.baseLayer.setTile({ x, y }, _tile_base_layer__WEBPACK_IMPORTED_MODULE_5__.BaseTile.Unknown, { allowGrow: false });
+                    this.start = this.tiles.getTileCoord({ x, y }, { x: 0.5, y: 0.5 });
+                    this.tiles.objectLayer.setTile({ x, y }, _tile_object_layer__WEBPACK_IMPORTED_MODULE_4__.ObjectTile.Spawn, { allowGrow: false });
+                    this.tiles.baseLayer.setTile({ x, y }, _tile_base_layer__WEBPACK_IMPORTED_MODULE_3__.BaseTile.Empty, { allowGrow: false });
                 }
                 else if (color === '0000ff') {
-                    this.tiles.objectLayer.setTile({ x, y }, _tile_object_layer__WEBPACK_IMPORTED_MODULE_6__.ObjectTile.Platform, { allowGrow: false });
-                    this.tiles.baseLayer.setTile({ x, y }, _tile_base_layer__WEBPACK_IMPORTED_MODULE_5__.BaseTile.Unknown, { allowGrow: false });
+                    this.tiles.objectLayer.setTile({ x, y }, _tile_object_layer__WEBPACK_IMPORTED_MODULE_4__.ObjectTile.Platform, { allowGrow: false });
+                    this.tiles.baseLayer.setTile({ x, y }, _tile_base_layer__WEBPACK_IMPORTED_MODULE_3__.BaseTile.Empty, { allowGrow: false });
                 }
                 else {
                     console.log(`Unknown color: ${color} at ${x}, ${y}.`);
                 }
             }
         }
-        this.tiles.baseLayer.fillInUnknownTiles();
         // this.camera.target = () => ({x: this.start.x, y: this.start.y});
         this.spawnPlayer();
     }
     spawnPlayer() {
-        const player = new _entity_player__WEBPACK_IMPORTED_MODULE_4__.Player(this);
+        const player = new _entity_player__WEBPACK_IMPORTED_MODULE_2__.Player(this);
         player.midX = this.start.x;
         player.maxY = this.start.y;
         this.entities.push(player);
@@ -821,13 +696,11 @@ class Level {
                 this.entities.splice(i, 1);
             }
         }
-        this.background?.update(dt);
         this.tiles.update(dt);
         this.camera.update(dt);
     }
     render(context) {
         this.camera.applyTransform(context);
-        this.background?.render(context);
         this.tiles.render(context);
         for (const entity of this.entities) {
             entity.render(context);
@@ -947,84 +820,64 @@ var BaseTile;
 (function (BaseTile) {
     BaseTile[BaseTile["Empty"] = 0] = "Empty";
     BaseTile[BaseTile["Wall"] = 1] = "Wall";
-    BaseTile[BaseTile["Background"] = 2] = "Background";
-    BaseTile[BaseTile["Unknown"] = 3] = "Unknown";
+    BaseTile[BaseTile["Hole"] = 2] = "Hole";
 })(BaseTile || (BaseTile = {}));
 class BaseLayer extends _tile_layer__WEBPACK_IMPORTED_MODULE_1__.TileLayer {
     constructor(w, h) {
         super(w, h);
-        // // Add a floor and some walls.
-        // for (let y = 0; y < this.h; y++) {
-        //     for (let x = 0; x < this.w; x++) {
-        //         this.tiles[y][x] = y == (this.h - 1) ? BaseTile.Wall : BaseTile.Empty;
-        //     }
-        //     this.tiles[y][0] = BaseTile.Wall;
-        //     this.tiles[y][this.w - 1] = BaseTile.Wall;
-        // }
-    }
-    fillInUnknownTiles() {
-        for (let y = this.minY; y <= this.maxY; y++) {
-            for (let x = this.minX; x <= this.maxX; x++) {
-                if (this.getTile({ x, y }) == BaseTile.Unknown) {
-                    console.log('filling in unknown tile', x, y);
-                    // Unknown tiles are filled based on the tile to the left and right.
-                    const horizontalTiles = [
-                        this.getTile({ x: x - 1, y }),
-                        this.getTile({ x: x + 1, y }),
-                    ];
-                    let newTile = this.pickTileToFillUnknown(horizontalTiles);
-                    this.setTile({ x, y }, newTile);
-                }
-            }
-        }
-    }
-    pickTileToFillUnknown(neighbors) {
-        // Filter out walls.
-        const filteredNeighbors = neighbors.filter((tile) => tile != BaseTile.Wall);
-        // Sort them (sort of a hack but works ok).
-        const sortedNeighbors = filteredNeighbors.sort();
-        // Because there's just two, we don't need to do the whole sorting thing... just pick the first.
-        // If this is empty, there are two walls. We use the background tile for that case.
-        return sortedNeighbors.length > 0 ? sortedNeighbors[0] : BaseTile.Background;
     }
     renderTile(context, pos) {
         const tile = this.getTile(pos);
         const renderPos = { x: pos.x * _constants__WEBPACK_IMPORTED_MODULE_0__.TILE_SIZE, y: pos.y * _constants__WEBPACK_IMPORTED_MODULE_0__.TILE_SIZE };
-        if (tile == BaseTile.Wall) {
-            // Loop through each corner
-            for (const dx of [-1, 1]) {
-                const dxTile = this.getTile({ x: pos.x + dx, y: pos.y });
-                for (const dy of [-1, 1]) {
-                    const subTilePos = { x: dx < 0 ? 0 : 1, y: dy < 0 ? 0 : 1 };
-                    const dyTile = this.getTile({ x: pos.x, y: pos.y + dy });
-                    const dxdyTile = this.getTile({ x: pos.x + dx, y: pos.y + dy });
-                    let tilePos = { x: 0, y: 0 };
-                    switch (dxTile) {
-                        case BaseTile.Wall:
-                            tilePos.x += 1;
-                            break;
-                        case BaseTile.Background:
-                            tilePos.x += 2;
-                            break;
-                    }
-                    switch (dyTile) {
-                        case BaseTile.Wall:
-                            tilePos.y += 1;
-                            break;
-                    }
-                    // // Special case for the corner piece.
-                    // if (dxTile == BaseTile.Wall && dyTile == BaseTile.Wall && dxdyTile != BaseTile.Wall) {
-                    //     tilePos.y += 2;
-                    // }
-                    this.drawQuarterTile(context, {
-                        tilePos,
-                        subTilePos,
-                        renderPos
-                    });
-                }
-            }
+        if (tile == BaseTile.Empty) {
+            this.drawTile(context, { tilePos: { x: 1, y: 1 }, renderPos });
+            return;
         }
-        else if (tile == BaseTile.Background) {
+        if (tile == BaseTile.Wall) {
+            const leftTile = this.getTile({ x: pos.x - 1, y: pos.y });
+            if (leftTile != BaseTile.Wall) {
+                this.drawTile(context, { tilePos: { x: 2, y: 1 }, renderPos });
+                return;
+            }
+            const rightTile = this.getTile({ x: pos.x + 1, y: pos.y });
+            if (rightTile != BaseTile.Wall) {
+                this.drawTile(context, { tilePos: { x: 0, y: 1 }, renderPos });
+                return;
+            }
+            const upTile = this.getTile({ x: pos.x, y: pos.y - 1 });
+            if (upTile != BaseTile.Wall) {
+                this.drawTile(context, { tilePos: { x: 1, y: 2 }, renderPos });
+                return;
+            }
+            const downTile = this.getTile({ x: pos.x, y: pos.y + 1 });
+            if (downTile != BaseTile.Wall) {
+                this.drawTile(context, { tilePos: { x: 1, y: 0 }, renderPos });
+                return;
+            }
+            const upLeftTile = this.getTile({ x: pos.x - 1, y: pos.y - 1 });
+            if (upLeftTile != BaseTile.Wall) {
+                this.drawTile(context, { tilePos: { x: 2, y: 2 }, renderPos });
+                return;
+            }
+            const upRightTile = this.getTile({ x: pos.x + 1, y: pos.y - 1 });
+            if (upRightTile != BaseTile.Wall) {
+                this.drawTile(context, { tilePos: { x: 0, y: 2 }, renderPos });
+                return;
+            }
+            const downLeftTile = this.getTile({ x: pos.x - 1, y: pos.y + 1 });
+            if (downLeftTile != BaseTile.Wall) {
+                this.drawTile(context, { tilePos: { x: 2, y: 0 }, renderPos });
+                return;
+            }
+            const downRightTile = this.getTile({ x: pos.x + 1, y: pos.y + 1 });
+            if (downRightTile != BaseTile.Wall) {
+                this.drawTile(context, { tilePos: { x: 0, y: 0 }, renderPos });
+                return;
+            }
+            this.drawTile(context, { tilePos: { x: 0, y: 3 }, renderPos });
+            return;
+        }
+        if (tile == BaseTile.Hole) {
             // A similar set of conditions as for the walls.
             for (const dx of [-1, 1]) {
                 const dxTile = this.getTile({ x: pos.x + dx, y: pos.y });
@@ -1032,19 +885,11 @@ class BaseLayer extends _tile_layer__WEBPACK_IMPORTED_MODULE_1__.TileLayer {
                     const subTilePos = { x: dx < 0 ? 0 : 1, y: dy < 0 ? 0 : 1 };
                     const dyTile = this.getTile({ x: pos.x, y: pos.y + dy });
                     let tilePos = { x: 3, y: 0 };
-                    switch (dxTile) {
-                        case BaseTile.Background:
-                        case BaseTile.Wall:
-                            tilePos.x += 1;
-                            break;
+                    if (dxTile != BaseTile.Empty) {
+                        tilePos.x += 1;
                     }
-                    switch (dyTile) {
-                        case BaseTile.Background:
-                            tilePos.y += 1;
-                            break;
-                        case BaseTile.Wall:
-                            tilePos.y += 2;
-                            break;
+                    if (dyTile != BaseTile.Empty) {
+                        tilePos.y += 1;
                     }
                     this.drawQuarterTile(context, {
                         tilePos,
@@ -1273,7 +1118,7 @@ var PhysicTile;
 (function (PhysicTile) {
     PhysicTile[PhysicTile["Empty"] = 0] = "Empty";
     PhysicTile[PhysicTile["Wall"] = 1] = "Wall";
-    PhysicTile[PhysicTile["OneWayPlatform"] = 2] = "OneWayPlatform";
+    PhysicTile[PhysicTile["Hole"] = 2] = "Hole";
 })(PhysicTile || (PhysicTile = {}));
 /**
  * 2D array of tiles.
@@ -1308,9 +1153,8 @@ class Tiles {
         if (baseTile == _base_layer__WEBPACK_IMPORTED_MODULE_2__.BaseTile.Wall) {
             return PhysicTile.Wall;
         }
-        const objectTile = this.objectLayer.getTile(p);
-        if (objectTile == _object_layer__WEBPACK_IMPORTED_MODULE_3__.ObjectTile.Platform) {
-            return PhysicTile.OneWayPlatform;
+        else if (baseTile == _base_layer__WEBPACK_IMPORTED_MODULE_2__.BaseTile.Hole) {
+            return PhysicTile.Hole;
         }
         return PhysicTile.Empty;
     }

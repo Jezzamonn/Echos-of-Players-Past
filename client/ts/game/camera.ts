@@ -30,7 +30,7 @@ export class FocusCamera extends Camera {
             return;
         }
 
-        const updateSmoothness = 1 - Math.exp(-3 * dt);
+        const updateSmoothness = 1 - Math.exp(-2 * dt);
         this.curPos.x = lerp(this.curPos.x, targetPos.x, updateSmoothness);
         this.curPos.y = lerp(this.curPos.y, targetPos.y, updateSmoothness);
     }

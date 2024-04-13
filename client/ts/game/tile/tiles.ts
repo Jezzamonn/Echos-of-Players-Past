@@ -1,15 +1,14 @@
 import { Point } from "../../common";
-import { PHYSICS_SCALE, rng, TILE_SIZE, TILE_SIZE_PX } from "../../constants";
-import { Aseprite, images } from "../../lib/aseprite";
+import { TILE_SIZE } from "../../constants";
 import { Images } from "../../lib/images";
 import { BaseLayer, BaseTile } from "./base-layer";
-import { ObjectLayer, ObjectTile } from "./object-layer";
+import { ObjectLayer } from "./object-layer";
 
 // All the types of tiles as far as how they interact with the game physics.
 export enum PhysicTile {
     Empty = 0,
     Wall = 1,
-    OneWayPlatform = 2,
+    Hole = 2,
 }
 
 export interface TileSource<T extends number> {
@@ -60,10 +59,8 @@ export class Tiles implements TileSource<PhysicTile> {
         if (baseTile == BaseTile.Wall) {
             return PhysicTile.Wall;
         }
-
-        const objectTile = this.objectLayer.getTile(p);
-        if (objectTile == ObjectTile.Platform) {
-            return PhysicTile.OneWayPlatform;
+        else if (baseTile == BaseTile.Hole) {
+            return PhysicTile.Hole;
         }
 
         return PhysicTile.Empty;
