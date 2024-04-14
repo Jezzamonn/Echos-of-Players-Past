@@ -1,0 +1,3 @@
+DIR="$(dirname "$(realpath "$0")")"
+
+mysql -h 127.0.0.1 -P 3306 -p < "$DIR"/init.sql

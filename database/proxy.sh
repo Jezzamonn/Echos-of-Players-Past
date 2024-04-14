@@ -1,0 +1,1 @@
+cloud-sql-proxy stellar-ether-198321:us-central1:ld55-db
