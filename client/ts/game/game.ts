@@ -53,8 +53,6 @@ export class Game {
         window.addEventListener('touchstart', () => this.enterFullscreen());
 
         this.doAnimationLoop();
-
-        this.startLevel(0);
     }
 
     nextLevel() {

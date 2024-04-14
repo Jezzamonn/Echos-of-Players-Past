@@ -1,7 +1,7 @@
 import { LitElement, css, html } from "lit";
 import { customElement } from "lit/decorators.js";
-import { imageName } from "../../game/entity/player";
-import { Aseprite } from "../../lib/aseprite";
+import { imageName } from "../game/entity/player";
+import { Aseprite } from "../lib/aseprite";
 
 @customElement("player-canvas")
 export class PlayerCanvasComponent extends LitElement {
@@ -51,6 +51,7 @@ export class PlayerCanvasComponent extends LitElement {
             animationName: 'idle',
             time: 0,
             position: {x: 0, y: 0},
+            layers: ['HairPointyLight', 'HeadLight', 'BodyGreen', 'Ghost'],
         });
     }
 }

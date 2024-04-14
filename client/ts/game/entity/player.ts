@@ -64,6 +64,7 @@ export class Player extends Entity {
             anchorRatios: {x: 0.5, y: 1},
             flippedX: this.facingDir === FacingDir.Left,
             loop,
+            layers: ['HairPointyLight', 'HeadLight', 'BodyGreen', 'Ghost'],
         });
     }
 
