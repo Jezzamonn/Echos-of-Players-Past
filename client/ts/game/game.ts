@@ -94,12 +94,11 @@ export class Game {
     }
 
     win() {
-        // TODO: Save player history for others to use.
-        const players = this.curLevel?.entities.filter(e => e instanceof Player) as Player[];
-        const inputRecordings = players.map(p => p.keyRecorder).filter(r => r != undefined) as KeyRecorder[];
         // Should only be one new recording.
-        const history = inputRecordings[0].keyHistory;
-        saveMoves("ActualPlayer", this.curLevel!.levelInfo.name, history);
+        const history = this.curLevel?.player?.keyRecorder?.keyHistory;
+        if (history) {
+            saveMoves("ActualPlayer", this.curLevel!.levelInfo.name, history);
+        }
 
         this.nextLevel();
     }
