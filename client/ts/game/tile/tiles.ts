@@ -9,8 +9,7 @@ import { ObjectLayer, ObjectTile, getButtonColor, getNormalTileType } from "./ob
 export enum PhysicTile {
     Empty = 0,
     Wall = 1,
-    Hole = 2,
-    Spikes = 3,
+    Death = 2,
 }
 
 export interface TileSource<T extends number> {
@@ -67,7 +66,7 @@ export class Tiles implements TileSource<PhysicTile> {
         const colorActive = objectButtonColor != undefined && this.level.buttonState[objectButtonColor];
 
         if (normalObjectTile == ObjectTile.Spikes && colorActive) {
-            return PhysicTile.Spikes;
+            return PhysicTile.Death;
         }
         if (normalObjectTile == ObjectTile.Bridge && colorActive) {
             return PhysicTile.Empty;
@@ -77,7 +76,7 @@ export class Tiles implements TileSource<PhysicTile> {
             return PhysicTile.Wall;
         }
         if (baseTile == BaseTile.Hole) {
-            return PhysicTile.Hole;
+            return PhysicTile.Death;
         }
         return PhysicTile.Empty;
     }

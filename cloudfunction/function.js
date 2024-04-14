@@ -65,6 +65,14 @@ async function helloWorld(req, res) {
             res.status(400).send('moves must be an array');
             return;
         }
+        if (moves.length === 0) {
+            res.status(400).send('moves must not be empty');
+            return;
+        }
+        if (moves.length > 500) {
+            res.status(400).send('Too many moves');
+            return;
+        }
         for (const move of moves) {
             if (!Array.isArray(move)) {
                 res.status(400).send('Each move must be an array');
