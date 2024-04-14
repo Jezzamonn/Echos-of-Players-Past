@@ -42,6 +42,10 @@ const poolPromise = connectWithConnector();
  * @param {!express:Response} res HTTP response context.
  */
 async function helloWorld(req, res) {
+    res.set('Access-Control-Allow-Origin', '*');
+    res.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    res.set('Access-Control-Allow-Headers', 'Content-Type');
+
     if (req.method === 'POST') {
         // Extract data from request
         const data = req.body;
@@ -91,7 +95,16 @@ async function helloWorld(req, res) {
     } else if (req.method === 'GET') {
         // Extract data from request
         const maxMovements = 20;
-        const levelName = req.query.levelName || 'level1';
+        const levelName = req.query.level;
+
+        if (typeof levelName !== 'string') {
+            res.status(400).send('levelName must be a string');
+            return;
+        }
+        if (levelName.length === 0) {
+            res.status(400).send('levelName must not be empty');
+            return;
+        }
 
         // Read data from database
         try {
@@ -101,6 +114,8 @@ async function helloWorld(req, res) {
             console.error(error);
             res.status(500).send('Error reading data');
         }
+    } else if (req.method === 'OPTIONS') {
+        res.status(204).send('');
     } else {
         res.status(405).send('Method not allowed');
     }
@@ -160,7 +175,6 @@ async function readMovements(maxMovements, levelName) {
             levelName,
             maxMovements,
         ]);
-        console.log(results)
 
         const movements = [];
         let movement = undefined;

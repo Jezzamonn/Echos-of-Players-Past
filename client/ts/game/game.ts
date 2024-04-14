@@ -7,6 +7,7 @@ import { Player } from "./entity/player";
 import { Level } from "./level";
 import { LEVELS, Levels } from "./levels";
 import { KeyRecorder } from "./recordreplay/key-recorder";
+import { fetchSavedMoves, saveMoves } from "./server-connection";
 import { SFX } from "./sfx";
 import { Tiles } from "./tile/tiles";
 
@@ -72,6 +73,10 @@ export class Game {
         level.initFromImage();
         this.curLevel = level;
 
+        fetchSavedMoves(levelInfo.name).then((savedMoves) => {
+            console.log(`Got saved moves for level ${levelInfo.name}:`, savedMoves);
+        });
+
         // if (levelInfo.song) {
         //     Sounds.setSong(levelInfo.song);
         // }
@@ -79,6 +84,11 @@ export class Game {
 
     win() {
         // TODO: Save player history for others to use.
+        const players = this.curLevel?.entities.filter(e => e instanceof Player) as Player[];
+        const inputRecordings = players.map(p => p.keyRecorder).filter(r => r != undefined) as KeyRecorder[];
+        // Should only be one new recording.
+        const history = inputRecordings[0].keyHistory;
+        saveMoves("ActualPlayer", this.curLevel!.levelInfo.name, history);
 
         this.nextLevel();
     }

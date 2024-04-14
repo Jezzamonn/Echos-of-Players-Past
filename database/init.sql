@@ -15,7 +15,7 @@ CREATE TABLE Movements (
 CREATE TABLE Moves (
     MoveId INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     MovementId INT NOT NULL,
-    Frame TINYINT NOT NULL,
+    Frame INT NOT NULL,
     KeysPressed TINYINT NOT NULL,
     FOREIGN KEY (MovementId) REFERENCES Movements(MovementId)
 );
