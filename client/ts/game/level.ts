@@ -25,10 +25,12 @@ export class Level {
     tiles: Tiles = new Tiles(0, 0, this);
 
     start: Point = { x: 0, y: 0 };
+    player: Player | undefined;
 
     keyReplayers: KeyReplayer[] = [];
 
     won = false;
+    inputStarted = false;
 
     buttonState: { [key in ButtonColor]: boolean } = {
         [ButtonColor.Red]: false,
@@ -123,14 +125,23 @@ export class Level {
             }
         }
 
-        const player = this.spawnPlayer();
+        this.player = this.spawnPlayer();
         // this.camera.target = () => player.cameraFocus();
 
-        player.onFirstInput = () => {
+        this.player.onFirstInput = () => {
             this.keyReplayers.forEach(replayer => replayer.start());
         }
 
         this.camera.target = () => ({x: image.width * TILE_SIZE / 2, y: (image.height + 2) * TILE_SIZE / 2});
+
+        if (this.levelInfo.numPlayers == 1) {
+            this.startInput();
+        }
+    }
+
+    startInput() {
+        this.player!.keys = this.game.keys;
+        this.inputStarted = true;
     }
 
     entitiesOfType<T>(type: new (...args: any[]) => T): T[] {
@@ -138,7 +149,7 @@ export class Level {
     }
 
     spawnPlayer(keyHistory: KeyHistory | undefined = undefined) {
-        let keys: RegularKeys = this.game.keys;
+        let keys: RegularKeys = this.game.nullKeys;
         if (keyHistory != undefined) {
             const replayer = new KeyReplayer(keyHistory);
             this.keyReplayers.push(replayer);

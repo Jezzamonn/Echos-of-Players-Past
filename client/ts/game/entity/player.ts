@@ -8,7 +8,7 @@ import { ObjectTile } from "../tile/object-layer";
 import { PhysicTile } from "../tile/tiles";
 import { Entity } from "./entity";
 
-const imageName = 'characters';
+export const imageName = 'characters';
 
 export class Player extends Entity {
 

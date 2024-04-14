@@ -3,3 +3,24 @@ html, body {
     margin: 0;
     overflow: hidden;
 }
+
+/* Use ChevyRay - Softsquare.tff for regular text and ChevyRay - Love Bug.tff for bold text */
+@font-face {
+    font-family: 'ChevyRay';
+    src: url('../font/ChevyRay - Softsquare Wide.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'ChevyRay';
+    src: url('../font/ChevyRay - Love Bug.ttf') format('truetype');
+    font-weight: bold;
+    font-style: normal;
+}
+
+body {
+    font-family: 'ChevyRay', sans-serif;
+    color: white;
+    font-size: 16px;
+}

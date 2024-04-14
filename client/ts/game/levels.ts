@@ -4,6 +4,7 @@ import { Sounds } from "../lib/sounds";
 export interface LevelInfo {
     name: string;
     song?: string;
+    numPlayers: number;
 }
 
 
@@ -13,12 +14,15 @@ export const LEVELS: LevelInfo[] = [
     // },
     {
         name: 'level1',
+        numPlayers: 1,
     },
     {
         name: 'level2',
+        numPlayers: 2,
     },
     {
         name: 'level-twoswitches',
+        numPlayers: 3,
     },
 ];
 

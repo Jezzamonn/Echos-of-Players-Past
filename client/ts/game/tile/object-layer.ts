@@ -47,17 +47,17 @@ export function getNormalTileType(tile: ObjectTile): ObjectTile {
 
 // Position of the tile in the tileset.
 const tilePositions: { [key in ObjectTile]?: Point } = {
-    [ObjectTile.Spawn]: { x: 7, y: 0 },
-    [ObjectTile.Goal]: { x: 7, y: 1 },
-    [ObjectTile.RedButton]: { x: 7, y: 2 },
-    [ObjectTile.RedSpikes]: { x: 7, y: 4 },
-    [ObjectTile.RedBridge]: { x: 7, y: 6 },
-    [ObjectTile.YellowButton]: { x: 6, y: 2 },
-    [ObjectTile.YellowSpikes]: { x: 6, y: 4 },
-    [ObjectTile.YellowBridge]: { x: 6, y: 6 },
-    [ObjectTile.BlueButton]: { x: 5, y: 2 },
-    [ObjectTile.BlueSpikes]: { x: 5, y: 4 },
-    [ObjectTile.BlueBridge]: { x: 5, y: 6 },
+    [ObjectTile.Spawn]: { x: 11, y: 0 },
+    [ObjectTile.Goal]: { x: 11, y: 1 },
+    [ObjectTile.RedButton]: { x: 11, y: 2 },
+    [ObjectTile.RedSpikes]: { x: 11, y: 4 },
+    [ObjectTile.RedBridge]: { x: 11, y: 6 },
+    [ObjectTile.YellowButton]: { x: 10, y: 2 },
+    [ObjectTile.YellowSpikes]: { x: 10, y: 4 },
+    [ObjectTile.YellowBridge]: { x: 10, y: 6 },
+    [ObjectTile.BlueButton]: { x: 9, y: 2 },
+    [ObjectTile.BlueSpikes]: { x: 9, y: 4 },
+    [ObjectTile.BlueBridge]: { x: 9, y: 6 },
 }
 
 export class ObjectLayer extends TileLayer<ObjectTile> {

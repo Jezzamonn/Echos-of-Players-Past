@@ -1,4 +1,6 @@
 import './loading-spinner';
-import './player-picker';
-import './summonable-player';
+import './picker/player-canvas';
+import './picker/player-picker';
+import './picker/summonable-player';
+import './root-component';
 

@@ -2,20 +2,21 @@ import { GAME_HEIGHT_PX, GAME_WIDTH_PX, PHYSICS_SCALE, RESTART_KEYS, TIME_STEP }
 import { Aseprite } from "../lib/aseprite";
 import { KeyboardKeys, NullKeys, RegularKeys } from "../lib/keys";
 import { Sounds } from "../lib/sounds";
-import { PlayerPickerComponent } from "../ui/player-picker";
 import { centerCanvas } from "./camera";
-import { fetchSavedMoves, saveMoves } from "./connection/server-connection";
+import { saveMoves } from "./connection/server-connection";
 import { Player } from "./entity/player";
 import { Level } from "./level";
 import { LEVELS, Levels } from "./levels";
+import { PlayerInfo } from "./player-info";
 import { KeyRecorder } from "./recordreplay/key-recorder";
 import { SFX } from "./sfx";
 import { Tiles } from "./tile/tiles";
 
-export class Game {
+let levelAttemptNumber = 0;
 
-    canvas: HTMLCanvasElement;
-    context: CanvasRenderingContext2D;
+export class Game {
+    canvas?: HTMLCanvasElement;
+    context?: CanvasRenderingContext2D;
 
     scale = 1;
 
@@ -28,25 +29,22 @@ export class Game {
     keys: RegularKeys;
     nullKeys = new NullKeys();
 
-    constructor(canvasSelector: string) {
-        const canvas = document.querySelector<HTMLCanvasElement>(canvasSelector);
-        if (!canvas) {
-            throw new Error(`Could not find canvas with selector ${canvasSelector}`);
-        }
-        const context = canvas.getContext('2d')!;
+    onLevelChange: ((name: string, attemptNum: number) => void) | undefined;
 
-        this.canvas = canvas;
-        this.context = context;
-
+    constructor() {
         this.keys = new KeyboardKeys();
 
         Sounds.loadMuteState();
     }
 
+    setCanvas(canvas: HTMLCanvasElement) {
+        this.canvas = canvas;
+        this.context = canvas.getContext('2d')!;
+        this.resize();
+    }
+
     start() {
         this.keys.setUp();
-
-        Aseprite.disableSmoothing(this.context);
 
         this.resize();
         window.addEventListener('resize', () => this.resize());
@@ -73,25 +71,26 @@ export class Game {
         const level = new Level(this, levelInfo);
         level.initFromImage();
         this.curLevel = level;
+        levelAttemptNumber++;
 
-        const playerPicker: PlayerPickerComponent | undefined = document.querySelector('player-picker') as PlayerPickerComponent;
-        playerPicker.players = undefined;
-
-        // TODO: Cancel this if it's not the current level no more.
-        fetchSavedMoves(levelInfo.name).then((savedMoves) => {
-            console.log(`Got saved moves for level ${levelInfo.name}:`, savedMoves);
-
-            const playerPicker: PlayerPickerComponent | undefined = document.querySelector('player-picker') as PlayerPickerComponent;
-            if (!playerPicker) {
-                return;
-            }
-
-            playerPicker.players = savedMoves;
-        });
+        if (this.onLevelChange) {
+            this.onLevelChange(levelInfo.name, levelAttemptNumber);
+        }
 
         // if (levelInfo.song) {
         //     Sounds.setSong(levelInfo.song);
         // }
+    }
+
+    selectPlayers(players: PlayerInfo[]) {
+        for (const player of players) {
+            this.curLevel?.spawnPlayer(player.moves);
+        }
+        this.curLevel?.startInput();
+    }
+
+    get inputStarted() {
+        return this.curLevel?.inputStarted ?? false;
     }
 
     win() {
@@ -187,6 +186,10 @@ export class Game {
     }
 
     render() {
+        if (!this.context) {
+            return;
+        }
+
         this.context.resetTransform();
         centerCanvas(this.context);
         this.applyScale(this.context);
@@ -213,6 +216,12 @@ export class Game {
         this.scale = pxScale / PHYSICS_SCALE;
 
         document.body.style.setProperty('--scale', `${pxScale / pixelScale}`);
+
+        // TODO: Think about how this fits with the lit element stuff.
+
+        if (!this.canvas || !this.context) {
+            return;
+        }
 
         this.canvas.width = windowWidth * pixelScale;
         this.canvas.height = windowHeight * pixelScale;

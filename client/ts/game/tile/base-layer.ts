@@ -81,12 +81,22 @@ export class BaseLayer extends TileLayer<BaseTile> {
                     const subTilePos = { x: dx < 0 ? 0 : 1, y: dy < 0 ? 0 : 1}
                     const dyTile = this.getTile({ x: pos.x, y: pos.y + dy });
 
+                    const dxdyTile = this.getTile({ x: pos.x + dx, y: pos.y + dy });
+
                     let tilePos: Point = { x: 3, y: 0 };
 
                     if (dxTile != BaseTile.Empty) {
                         tilePos.x += 1;
                     }
                     if (dyTile != BaseTile.Empty) {
+                        tilePos.y += 1;
+                    }
+
+                    if (dxTile != BaseTile.Empty && dyTile != BaseTile.Empty && dxdyTile == BaseTile.Empty) {
+                        // Specific corner tiles.
+                        tilePos.y += 1;
+                    }
+                    else if (dxTile == BaseTile.Empty && dyTile != BaseTile.Empty && dxdyTile != BaseTile.Empty) {
                         tilePos.y += 1;
                     }
 
