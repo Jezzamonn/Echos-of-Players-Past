@@ -103,7 +103,7 @@ export class Game {
         // Should only be one new recording.
         const history = this.curLevel?.player?.keyRecorder?.keyHistory;
         if (history) {
-            saveMoves('ActualPlayer', this.curLevel!.levelInfo.name, history);
+            saveMoves(this.playerVisualInfo!, this.curLevel!.levelInfo.name, history);
         }
 
         this.nextLevel();

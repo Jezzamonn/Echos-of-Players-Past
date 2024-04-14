@@ -123,6 +123,8 @@ export class PlayerPickerComponent extends LitElement {
             this.selectedPlayers = [];
             this.players = await fetchSavedMoves(this.levelName);
 
+            console.log(`Got players for level ${this.levelName}: ${this.players}`)
+
             this.maybeSendSelected();
         }
     }

@@ -40,6 +40,10 @@ export class CharacterCustomizerComponent extends LitElement {
     @state()
     name = '';
 
+    get nameValid() {
+        return this.name != undefined && this.name.length > 0;
+    }
+
     @state()
     hairColor = choose(['Black', 'Brown', 'Blonde'], Math.random);
 
@@ -60,6 +64,7 @@ export class CharacterCustomizerComponent extends LitElement {
             skinTone: this.skinTone,
             clothing: this.clothing,
         };
+        const nameValid = this.nameValid;
         return html`
             <h1>Character Customizer</h1>
             <player-canvas .player=${playerInfo}></player-canvas>
@@ -141,6 +146,7 @@ export class CharacterCustomizerComponent extends LitElement {
             </div>
             <button
                 class="go-button"
+                ?disabled=${!nameValid}
                 @click=${() => {
                     this.dispatchEvent(
                         new CustomEvent('start-game', {

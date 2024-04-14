@@ -21,7 +21,7 @@ export const LEVELS: LevelInfo[] = [
         numPlayers: 2,
     },
     {
-        name: 'level-twoswitches',
+        name: 'twoswitches',
         numPlayers: 3,
     },
 ];
