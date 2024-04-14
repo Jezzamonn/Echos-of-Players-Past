@@ -8,7 +8,6 @@ async function init() {
     await Game.preload()
 
     const game = new Game();
-    game.start();
     // Global game to make events and such easier.
     (window as any).game = game;
 
@@ -28,7 +27,7 @@ async function init() {
     root.addEventListener('start-game', (event: CustomEvent<PlayerVisualInfo>) => {
         console.log('start game')
         game.playerVisualInfo = event.detail;
-        game.startLevel(0);
+        game.start();
     });
 }
 
