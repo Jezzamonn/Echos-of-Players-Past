@@ -3,6 +3,7 @@ import { ACTION_KEYS, DOWN_KEYS, FPS, LEFT_KEYS, PHYSICS_SCALE, RIGHT_KEYS, UP_K
 import { Aseprite } from "../../lib/aseprite";
 import { RegularKeys } from "../../lib/keys";
 import { Level } from "../level";
+import { PlayerVisualInfo, playerInfoToLayers } from "../player-info";
 import { KeyRecorder } from "../recordreplay/key-recorder";
 import { ObjectTile } from "../tile/object-layer";
 import { PhysicTile } from "../tile/tiles";
@@ -21,12 +22,14 @@ export class Player extends Entity {
     dead = false;
 
     onFirstInput: (() => void) | undefined;
+    visualInfo: PlayerVisualInfo;
 
-    constructor(level: Level, keys: RegularKeys, recordInput: boolean = true) {
+    constructor(level: Level, visualInfo: PlayerVisualInfo, keys: RegularKeys, recordInput: boolean = true) {
         super(level);
         // TODO: Set w and h
         this.w = physFromPx(5);
         this.h = physFromPx(5);
+        this.visualInfo = visualInfo;
 
         this.keys = keys;
         if (recordInput) {
@@ -64,7 +67,7 @@ export class Player extends Entity {
             anchorRatios: {x: 0.5, y: 1},
             flippedX: this.facingDir === FacingDir.Left,
             loop,
-            layers: ['HairPointyLight', 'HeadLight', 'BodyGreen', 'Ghost'],
+            layers: playerInfoToLayers(this.visualInfo),
         });
     }
 

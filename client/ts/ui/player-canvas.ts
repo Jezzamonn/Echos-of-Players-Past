@@ -1,6 +1,7 @@
 import { LitElement, css, html } from "lit";
-import { customElement } from "lit/decorators.js";
+import { customElement, property } from "lit/decorators.js";
 import { imageName } from "../game/entity/player";
+import { PlayerVisualInfo, playerInfoToLayers } from "../game/player-info";
 import { Aseprite } from "../lib/aseprite";
 
 @customElement("player-canvas")
@@ -13,7 +14,8 @@ export class PlayerCanvasComponent extends LitElement {
         }
     `;
 
-    hasDrawnPlayer = false;
+    @property({ type: Object })
+    accessor player: PlayerVisualInfo | undefined = undefined;
 
     render() {
         const image = Aseprite.images[imageName];
@@ -35,23 +37,26 @@ export class PlayerCanvasComponent extends LitElement {
     }
 
     updated() {
-        if (!this.hasDrawnPlayer && Aseprite.images[imageName].loaded) {
-            this.drawPlayer();
-            this.hasDrawnPlayer = true;
-        }
+        this.drawPlayer();
     }
 
     drawPlayer() {
-        console.log('drawing player')
-        const canvas = this.shadowRoot!.querySelector("canvas")!;
+        if (!this.player) {
+            return;
+        }
+        const canvas = this.shadowRoot!.querySelector("canvas") as HTMLCanvasElement;
+        if (!canvas) {
+            return;
+        }
         const context = canvas.getContext("2d")!;
+        context.clearRect(0, 0, canvas.width, canvas.height);
         Aseprite.drawAnimation({
             context,
             image: imageName,
             animationName: 'idle',
             time: 0,
             position: {x: 0, y: 0},
-            layers: ['HairPointyLight', 'HeadLight', 'BodyGreen', 'Ghost'],
+            layers: playerInfoToLayers(this.player),
         });
     }
 }

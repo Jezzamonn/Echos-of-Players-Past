@@ -7,7 +7,7 @@ import { Entity } from "./entity/entity";
 import { Player } from "./entity/player";
 import { Game } from "./game";
 import { LevelInfo } from "./levels";
-import { KeyHistory } from "./recordreplay/key-history";
+import { PlayerInfo } from "./player-info";
 import { KeyReplayer } from "./recordreplay/key-replayer";
 import { BaseTile } from "./tile/base-layer";
 import { ButtonColor, ObjectTile } from "./tile/object-layer";
@@ -148,14 +148,20 @@ export class Level {
         return this.entities.filter(e => e instanceof type) as T[];
     }
 
-    spawnPlayer(keyHistory: KeyHistory | undefined = undefined) {
+    spawnReplayer(playerInfo: PlayerInfo) {
+        const replayer = new KeyReplayer(playerInfo.moves);
+        this.keyReplayers.push(replayer);
+        const keys = replayer;
+
+        const player = new Player(this, playerInfo, keys, false);
+        player.midX = this.start.x;
+        player.maxY = this.start.y;
+        this.entities.push(player);
+    }
+
+    spawnPlayer() {
         let keys: RegularKeys = this.game.nullKeys;
-        if (keyHistory != undefined) {
-            const replayer = new KeyReplayer(keyHistory);
-            this.keyReplayers.push(replayer);
-            keys = replayer;
-        }
-        const player = new Player(this, keys, keyHistory == undefined);
+        const player = new Player(this, this.game.playerVisualInfo!, keys, true);
         player.midX = this.start.x;
         player.maxY = this.start.y;
         this.entities.push(player);

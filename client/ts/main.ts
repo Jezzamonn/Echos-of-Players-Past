@@ -1,7 +1,7 @@
 import './ui/all-ui';
 
 import { Game } from "./game/game";
-import { PlayerInfo } from './game/player-info';
+import { PlayerInfo, PlayerVisualInfo } from './game/player-info';
 import { RootComponent } from './ui/root-component';
 
 async function init() {
@@ -23,6 +23,12 @@ async function init() {
     root.addEventListener('players-selected', (event: CustomEvent<PlayerInfo[]>) => {
         console.log('players selected')
         game.selectPlayers(event.detail);
+    });
+
+    root.addEventListener('start-game', (event: CustomEvent<PlayerVisualInfo>) => {
+        console.log('start game')
+        game.playerVisualInfo = event.detail;
+        game.startLevel(0);
     });
 }
 

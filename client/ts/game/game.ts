@@ -1,16 +1,22 @@
-import { GAME_HEIGHT_PX, GAME_WIDTH_PX, PHYSICS_SCALE, RESTART_KEYS, TIME_STEP } from "../constants";
-import { Aseprite } from "../lib/aseprite";
-import { KeyboardKeys, NullKeys, RegularKeys } from "../lib/keys";
-import { Sounds } from "../lib/sounds";
-import { centerCanvas } from "./camera";
-import { saveMoves } from "./connection/server-connection";
-import { Player } from "./entity/player";
-import { Level } from "./level";
-import { LEVELS, Levels } from "./levels";
-import { PlayerInfo } from "./player-info";
-import { KeyRecorder } from "./recordreplay/key-recorder";
-import { SFX } from "./sfx";
-import { Tiles } from "./tile/tiles";
+import {
+    GAME_HEIGHT_PX,
+    GAME_WIDTH_PX,
+    PHYSICS_SCALE,
+    RESTART_KEYS,
+    TIME_STEP,
+} from '../constants';
+import { Aseprite } from '../lib/aseprite';
+import { KeyboardKeys, NullKeys, RegularKeys } from '../lib/keys';
+import { Sounds } from '../lib/sounds';
+import { centerCanvas } from './camera';
+import { saveMoves } from './connection/server-connection';
+import { Player } from './entity/player';
+import { Level } from './level';
+import { LEVELS, Levels } from './levels';
+import { PlayerInfo, PlayerVisualInfo } from './player-info';
+import { KeyRecorder } from './recordreplay/key-recorder';
+import { SFX } from './sfx';
+import { Tiles } from './tile/tiles';
 
 let levelAttemptNumber = 0;
 
@@ -28,6 +34,8 @@ export class Game {
 
     keys: RegularKeys;
     nullKeys = new NullKeys();
+
+    playerVisualInfo: PlayerVisualInfo | undefined;
 
     onLevelChange: ((name: string, attemptNum: number) => void) | undefined;
 
@@ -82,7 +90,7 @@ export class Game {
 
     selectPlayers(players: PlayerInfo[]) {
         for (const player of players) {
-            this.curLevel?.spawnPlayer(player.moves);
+            this.curLevel?.spawnReplayer(player);
         }
         this.curLevel?.startInput();
     }
@@ -95,7 +103,7 @@ export class Game {
         // Should only be one new recording.
         const history = this.curLevel?.player?.keyRecorder?.keyHistory;
         if (history) {
-            saveMoves("ActualPlayer", this.curLevel!.levelInfo.name, history);
+            saveMoves('ActualPlayer', this.curLevel!.levelInfo.name, history);
         }
 
         this.nextLevel();
@@ -103,20 +111,36 @@ export class Game {
 
     debugLoop() {
         // Debug thing to test that we can record input properly:
-        const oldHistorys = this.curLevel?.keyReplayers.map(r => r.keyHistory) ?? [];
+        const oldHistorys = this.curLevel?.keyReplayers.map((r) => r.keyHistory) ?? [];
 
         // Get all the players
-        const players = this.curLevel?.entities.filter(e => e instanceof Player) as Player[];
-        const inputRecordings = players.map(p => p.keyRecorder).filter(r => r != undefined) as KeyRecorder[];
+        const players = this.curLevel?.entities.filter((e) => e instanceof Player) as Player[];
+        const inputRecordings = players
+            .map((p) => p.keyRecorder)
+            .filter((r) => r != undefined) as KeyRecorder[];
 
         this.startLevel(this.levelIndex);
 
+        if (this.playerVisualInfo == undefined) {
+            return;
+        }
+
         // Add players to the new level
         for (const recording of inputRecordings) {
-            this.curLevel!.spawnPlayer(recording.keyHistory);
+            const newPlayerInfo: PlayerInfo = Object.assign(
+                { moves: recording.keyHistory, player: 'DebugPlayer' },
+                this.playerVisualInfo
+            );
+
+            this.curLevel!.spawnReplayer(newPlayerInfo);
         }
         for (const history of oldHistorys) {
-            this.curLevel!.spawnPlayer(history);
+            const newPlayerInfo: PlayerInfo = Object.assign(
+                { moves: history, player: 'DebugPlayer' },
+                this.playerVisualInfo
+            );
+
+            this.curLevel!.spawnReplayer(newPlayerInfo);
         }
     }
 
@@ -172,8 +196,7 @@ export class Game {
             this.curLevel?.update(dt);
 
             this.keys.resetFrame();
-        }
-        catch (e) {
+        } catch (e) {
             console.error(e);
         }
     }
@@ -193,8 +216,7 @@ export class Game {
 
         try {
             this.curLevel?.render(this.context);
-        }
-        catch (e) {
+        } catch (e) {
             console.error(e);
         }
     }
@@ -245,11 +267,7 @@ export class Game {
     }
 
     static async preload() {
-        await Promise.all([
-            Levels.preload(),
-            Tiles.preload(),
-            Player.preload(),
-        ]);
+        await Promise.all([Levels.preload(), Tiles.preload(), Player.preload()]);
         SFX.preload();
     }
 }

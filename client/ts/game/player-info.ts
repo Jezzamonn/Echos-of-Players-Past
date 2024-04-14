@@ -13,3 +13,24 @@ export interface PlayerInfo {
     skinTone?: string;
     clothing?: string;
 }
+
+export interface PlayerVisualInfo {
+    player?: string;
+    hairColor?: string;
+    hairStyle?: string;
+    skinTone?: string;
+    clothing?: string;
+}
+
+export function playerInfoToLayers(player: PlayerVisualInfo): string[] {
+    let hairLayer = `Hair${player.hairStyle}${player.hairColor}`;
+    if (player.hairStyle === 'bald') {
+        hairLayer = '';
+    }
+    return [
+        hairLayer,
+        `Head${player.skinTone}`,
+        `Body${player.clothing}`,
+        "Ghost"
+    ];
+}
