@@ -478,7 +478,7 @@
    },
    {
     "filename": "characters (HeadMedium) 1.aseprite",
-    "frame": { "x": 89, "y": 45, "w": 19, "h": 19 },
+    "frame": { "x": 111, "y": 45, "w": 19, "h": 19 },
     "rotated": false,
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 19, "h": 19 },
@@ -496,7 +496,7 @@
    },
    {
     "filename": "characters (HeadMedium) 3.aseprite",
-    "frame": { "x": 111, "y": 1, "w": 19, "h": 19 },
+    "frame": { "x": 133, "y": 1, "w": 19, "h": 19 },
     "rotated": false,
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 19, "h": 19 },
@@ -586,7 +586,7 @@
    },
    {
     "filename": "characters (HeadLight) 0.aseprite",
-    "frame": { "x": 111, "y": 45, "w": 19, "h": 19 },
+    "frame": { "x": 133, "y": 23, "w": 19, "h": 19 },
     "rotated": false,
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 19, "h": 19 },
@@ -595,7 +595,7 @@
    },
    {
     "filename": "characters (HeadLight) 1.aseprite",
-    "frame": { "x": 133, "y": 1, "w": 19, "h": 19 },
+    "frame": { "x": 133, "y": 45, "w": 19, "h": 19 },
     "rotated": false,
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 19, "h": 19 },
@@ -604,7 +604,7 @@
    },
    {
     "filename": "characters (HeadLight) 2.aseprite",
-    "frame": { "x": 111, "y": 45, "w": 19, "h": 19 },
+    "frame": { "x": 133, "y": 23, "w": 19, "h": 19 },
     "rotated": false,
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 19, "h": 19 },
@@ -613,7 +613,7 @@
    },
    {
     "filename": "characters (HeadLight) 3.aseprite",
-    "frame": { "x": 133, "y": 23, "w": 19, "h": 19 },
+    "frame": { "x": 155, "y": 1, "w": 19, "h": 19 },
     "rotated": false,
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 19, "h": 19 },
@@ -703,7 +703,7 @@
    },
    {
     "filename": "characters (HairPoofyBlack) 0.aseprite",
-    "frame": { "x": 133, "y": 45, "w": 19, "h": 19 },
+    "frame": { "x": 155, "y": 23, "w": 19, "h": 19 },
     "rotated": false,
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 19, "h": 19 },
@@ -712,7 +712,7 @@
    },
    {
     "filename": "characters (HairPoofyBlack) 1.aseprite",
-    "frame": { "x": 133, "y": 45, "w": 19, "h": 19 },
+    "frame": { "x": 155, "y": 23, "w": 19, "h": 19 },
     "rotated": false,
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 19, "h": 19 },
@@ -721,7 +721,7 @@
    },
    {
     "filename": "characters (HairPoofyBlack) 2.aseprite",
-    "frame": { "x": 133, "y": 45, "w": 19, "h": 19 },
+    "frame": { "x": 155, "y": 23, "w": 19, "h": 19 },
     "rotated": false,
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 19, "h": 19 },
@@ -730,7 +730,7 @@
    },
    {
     "filename": "characters (HairPoofyBlack) 3.aseprite",
-    "frame": { "x": 155, "y": 1, "w": 19, "h": 19 },
+    "frame": { "x": 155, "y": 45, "w": 19, "h": 19 },
     "rotated": false,
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 19, "h": 19 },
@@ -820,7 +820,7 @@
    },
    {
     "filename": "characters (HairPoofyBrown) 0.aseprite",
-    "frame": { "x": 155, "y": 23, "w": 19, "h": 19 },
+    "frame": { "x": 177, "y": 1, "w": 19, "h": 19 },
     "rotated": false,
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 19, "h": 19 },
@@ -829,7 +829,7 @@
    },
    {
     "filename": "characters (HairPoofyBrown) 1.aseprite",
-    "frame": { "x": 155, "y": 23, "w": 19, "h": 19 },
+    "frame": { "x": 177, "y": 1, "w": 19, "h": 19 },
     "rotated": false,
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 19, "h": 19 },
@@ -838,7 +838,7 @@
    },
    {
     "filename": "characters (HairPoofyBrown) 2.aseprite",
-    "frame": { "x": 155, "y": 23, "w": 19, "h": 19 },
+    "frame": { "x": 177, "y": 1, "w": 19, "h": 19 },
     "rotated": false,
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 19, "h": 19 },
@@ -847,7 +847,7 @@
    },
    {
     "filename": "characters (HairPoofyBrown) 3.aseprite",
-    "frame": { "x": 155, "y": 45, "w": 19, "h": 19 },
+    "frame": { "x": 177, "y": 23, "w": 19, "h": 19 },
     "rotated": false,
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 19, "h": 19 },
@@ -937,7 +937,7 @@
    },
    {
     "filename": "characters (HairPoofyBlind) 0.aseprite",
-    "frame": { "x": 177, "y": 1, "w": 19, "h": 19 },
+    "frame": { "x": 177, "y": 45, "w": 19, "h": 19 },
     "rotated": false,
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 19, "h": 19 },
@@ -946,7 +946,7 @@
    },
    {
     "filename": "characters (HairPoofyBlind) 1.aseprite",
-    "frame": { "x": 177, "y": 1, "w": 19, "h": 19 },
+    "frame": { "x": 177, "y": 45, "w": 19, "h": 19 },
     "rotated": false,
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 19, "h": 19 },
@@ -955,7 +955,7 @@
    },
    {
     "filename": "characters (HairPoofyBlind) 2.aseprite",
-    "frame": { "x": 177, "y": 1, "w": 19, "h": 19 },
+    "frame": { "x": 177, "y": 45, "w": 19, "h": 19 },
     "rotated": false,
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 19, "h": 19 },
@@ -964,7 +964,7 @@
    },
    {
     "filename": "characters (HairPoofyBlind) 3.aseprite",
-    "frame": { "x": 177, "y": 23, "w": 19, "h": 19 },
+    "frame": { "x": 199, "y": 1, "w": 19, "h": 19 },
     "rotated": false,
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 19, "h": 19 },
@@ -1054,7 +1054,7 @@
    },
    {
     "filename": "characters (HairPointyBlack) 0.aseprite",
-    "frame": { "x": 177, "y": 45, "w": 19, "h": 19 },
+    "frame": { "x": 199, "y": 23, "w": 19, "h": 19 },
     "rotated": false,
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 19, "h": 19 },
@@ -1063,7 +1063,7 @@
    },
    {
     "filename": "characters (HairPointyBlack) 1.aseprite",
-    "frame": { "x": 177, "y": 45, "w": 19, "h": 19 },
+    "frame": { "x": 199, "y": 23, "w": 19, "h": 19 },
     "rotated": false,
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 19, "h": 19 },
@@ -1072,7 +1072,7 @@
    },
    {
     "filename": "characters (HairPointyBlack) 2.aseprite",
-    "frame": { "x": 177, "y": 45, "w": 19, "h": 19 },
+    "frame": { "x": 199, "y": 23, "w": 19, "h": 19 },
     "rotated": false,
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 19, "h": 19 },
@@ -1081,7 +1081,7 @@
    },
    {
     "filename": "characters (HairPointyBlack) 3.aseprite",
-    "frame": { "x": 199, "y": 1, "w": 19, "h": 19 },
+    "frame": { "x": 199, "y": 45, "w": 19, "h": 19 },
     "rotated": false,
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 19, "h": 19 },
@@ -1171,7 +1171,7 @@
    },
    {
     "filename": "characters (HairPointyBrown) 0.aseprite",
-    "frame": { "x": 199, "y": 23, "w": 19, "h": 19 },
+    "frame": { "x": 221, "y": 1, "w": 19, "h": 19 },
     "rotated": false,
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 19, "h": 19 },
@@ -1180,7 +1180,7 @@
    },
    {
     "filename": "characters (HairPointyBrown) 1.aseprite",
-    "frame": { "x": 199, "y": 23, "w": 19, "h": 19 },
+    "frame": { "x": 221, "y": 1, "w": 19, "h": 19 },
     "rotated": false,
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 19, "h": 19 },
@@ -1189,7 +1189,7 @@
    },
    {
     "filename": "characters (HairPointyBrown) 2.aseprite",
-    "frame": { "x": 199, "y": 23, "w": 19, "h": 19 },
+    "frame": { "x": 221, "y": 1, "w": 19, "h": 19 },
     "rotated": false,
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 19, "h": 19 },
@@ -1198,7 +1198,7 @@
    },
    {
     "filename": "characters (HairPointyBrown) 3.aseprite",
-    "frame": { "x": 199, "y": 45, "w": 19, "h": 19 },
+    "frame": { "x": 221, "y": 23, "w": 19, "h": 19 },
     "rotated": false,
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 19, "h": 19 },
@@ -1288,7 +1288,7 @@
    },
    {
     "filename": "characters (HairPointyBlond) 0.aseprite",
-    "frame": { "x": 221, "y": 1, "w": 19, "h": 19 },
+    "frame": { "x": 221, "y": 45, "w": 19, "h": 19 },
     "rotated": false,
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 19, "h": 19 },
@@ -1297,7 +1297,7 @@
    },
    {
     "filename": "characters (HairPointyBlond) 1.aseprite",
-    "frame": { "x": 221, "y": 1, "w": 19, "h": 19 },
+    "frame": { "x": 221, "y": 45, "w": 19, "h": 19 },
     "rotated": false,
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 19, "h": 19 },
@@ -1306,7 +1306,7 @@
    },
    {
     "filename": "characters (HairPointyBlond) 2.aseprite",
-    "frame": { "x": 221, "y": 1, "w": 19, "h": 19 },
+    "frame": { "x": 221, "y": 45, "w": 19, "h": 19 },
     "rotated": false,
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 19, "h": 19 },
@@ -1315,7 +1315,7 @@
    },
    {
     "filename": "characters (HairPointyBlond) 3.aseprite",
-    "frame": { "x": 221, "y": 23, "w": 19, "h": 19 },
+    "frame": { "x": 243, "y": 1, "w": 19, "h": 19 },
     "rotated": false,
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 19, "h": 19 },
@@ -1409,7 +1409,7 @@
   "version": "1.3.2-x64",
   "image": "characters.png",
   "format": "RGBA8888",
-  "size": { "w": 241, "h": 66 },
+  "size": { "w": 263, "h": 66 },
   "scale": "1",
   "frameTags": [
    { "name": "idle", "from": 0, "to": 1, "direction": "forward", "color": "#000000ff" },

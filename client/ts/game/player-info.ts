@@ -23,14 +23,14 @@ export interface PlayerVisualInfo {
 }
 
 export function playerInfoToLayers(player: PlayerVisualInfo): string[] {
-    let hairLayer = `Hair${player.hairStyle}${player.hairColor}`;
+    let hairLayer = `Hair${player.hairStyle ?? 'Poofy'}${player.hairColor ?? 'Brown'}`;
     if (player.hairStyle === 'bald') {
         hairLayer = '';
     }
     return [
         hairLayer,
-        `Head${player.skinTone}`,
-        `Body${player.clothing}`,
+        `Head${player.skinTone ?? 'Medium'}`,
+        `Body${player.clothing ?? 'Blue'}`,
         "Ghost"
     ];
 }
