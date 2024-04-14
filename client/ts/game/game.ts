@@ -2,12 +2,13 @@ import { GAME_HEIGHT_PX, GAME_WIDTH_PX, PHYSICS_SCALE, RESTART_KEYS, TIME_STEP }
 import { Aseprite } from "../lib/aseprite";
 import { KeyboardKeys, NullKeys, RegularKeys } from "../lib/keys";
 import { Sounds } from "../lib/sounds";
+import { PlayerPickerComponent } from "../ui/player-picker";
 import { centerCanvas } from "./camera";
+import { fetchSavedMoves, saveMoves } from "./connection/server-connection";
 import { Player } from "./entity/player";
 import { Level } from "./level";
 import { LEVELS, Levels } from "./levels";
 import { KeyRecorder } from "./recordreplay/key-recorder";
-import { fetchSavedMoves, saveMoves } from "./server-connection";
 import { SFX } from "./sfx";
 import { Tiles } from "./tile/tiles";
 
@@ -73,8 +74,19 @@ export class Game {
         level.initFromImage();
         this.curLevel = level;
 
+        const playerPicker: PlayerPickerComponent | undefined = document.querySelector('player-picker') as PlayerPickerComponent;
+        playerPicker.players = undefined;
+
+        // TODO: Cancel this if it's not the current level no more.
         fetchSavedMoves(levelInfo.name).then((savedMoves) => {
             console.log(`Got saved moves for level ${levelInfo.name}:`, savedMoves);
+
+            const playerPicker: PlayerPickerComponent | undefined = document.querySelector('player-picker') as PlayerPickerComponent;
+            if (!playerPicker) {
+                return;
+            }
+
+            playerPicker.players = savedMoves;
         });
 
         // if (levelInfo.song) {

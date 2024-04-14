@@ -1,3 +1,5 @@
+import './ui/all-ui';
+
 import { Game } from "./game/game";
 
 async function init() {

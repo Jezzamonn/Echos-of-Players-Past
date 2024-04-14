@@ -37,7 +37,8 @@
     }
   },
   "dependencies": {
-    "jsfxr": "github:Jezzamonn/jsfxr"
+    "jsfxr": "github:Jezzamonn/jsfxr",
+    "lit": "^3.1.2"
   },
   "devDependencies": {
     "@tsconfig/recommended": "^1.0.6",
