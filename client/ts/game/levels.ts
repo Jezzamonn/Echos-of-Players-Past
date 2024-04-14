@@ -22,8 +22,28 @@ export const LEVELS: LevelInfo[] = [
     },
     {
         name: 'twoswitches',
+        numPlayers: 2,
+    },
+    {
+        name: 'spikes',
+        numPlayers: 2,
+    },
+    {
+        name: 'toggle-buttons',
+        numPlayers: 2,
+    },
+    {
+        name: 'threeplayers',
         numPlayers: 3,
     },
+    {
+        name: 'chaos',
+        numPlayers: 4,
+    },
+    {
+        name: 'silly',
+        numPlayers: 5,
+    }
 ];
 
 export class Levels {

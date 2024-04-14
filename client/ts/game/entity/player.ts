@@ -122,7 +122,7 @@ export class Player extends Entity {
         }
 
         // Check for dying X_X
-        if (this.isOnTile(this.level.tiles, PhysicTile.Death)) {
+        if (this.isOnTile(this.level.tiles, PhysicTile.Hole) || this.isTouchingTile(this.level.tiles, PhysicTile.Death)) {
             this.die();
         }
 

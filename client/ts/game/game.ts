@@ -267,7 +267,19 @@ export class Game {
     }
 
     static async preload() {
-        await Promise.all([Levels.preload(), Tiles.preload(), Player.preload()]);
+        await Promise.all([
+            Levels.preload(),
+            Tiles.preload(),
+            Player.preload(),
+            Sounds.loadSound({ name: 'melody', path: 'music/' }),
+            Sounds.loadSound({ name: 'bass', path: 'music/' }),
+            Sounds.loadSound({ name: 'chords', path: 'music/' }),
+            Sounds.loadSound({ name: 'chords-small', path: 'music/' }),
+            Sounds.loadSound({ name: 'drums', path: 'music/' }),
+            Sounds.loadSound({ name: 'drums-small', path: 'music/' }),
+        ]);
+        // Not awaited.
         SFX.preload();
+        Sounds.setSongs(['drums', 'chords', 'bass', 'melody']);
     }
 }

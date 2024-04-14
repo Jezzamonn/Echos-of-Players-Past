@@ -9,7 +9,8 @@ import { ObjectLayer, ObjectTile, getButtonColor, getNormalTileType } from "./ob
 export enum PhysicTile {
     Empty = 0,
     Wall = 1,
-    Death = 2,
+    Hole = 2,
+    Death = 3,
 }
 
 export interface TileSource<T extends number> {
@@ -76,7 +77,7 @@ export class Tiles implements TileSource<PhysicTile> {
             return PhysicTile.Wall;
         }
         if (baseTile == BaseTile.Hole) {
-            return PhysicTile.Death;
+            return PhysicTile.Hole;
         }
         return PhysicTile.Empty;
     }
