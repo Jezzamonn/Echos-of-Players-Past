@@ -27,6 +27,7 @@ async function init() {
 
     root.addEventListener('hide-title', () => {
         root.uiState = UIState.Customizing;
+        Sounds.setSongs([]);
     });
 
     root.addEventListener('select-customization', (event: CustomEvent<PlayerVisualInfo>) => {
@@ -34,8 +35,6 @@ async function init() {
         game.playerVisualInfo = event.detail;
         game.start();
     });
-
-    Sounds.setSongs([]);
 }
 
 init();
