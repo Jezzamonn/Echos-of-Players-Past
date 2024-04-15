@@ -135,6 +135,8 @@ class _Sounds {
 
         console.log('Setting songs', songNames, currentTime);
 
+        const promises: Promise<any>[] = [];
+
         for (const songName of songNames) {
             const audioInfo = this.audios[songName];
             if (audioInfo == null) {
@@ -144,8 +146,6 @@ class _Sounds {
             const currentlyPlaying = this.curSongs[songName];
             if (currentlyPlaying != null) {
                 // Already playing this song.
-                // Make sure they're synced.
-                currentlyPlaying.currentTime = currentTime;
                 continue;
             }
 
@@ -171,6 +171,23 @@ class _Sounds {
                 // We'll try to play it again when startSongIfNotAlreadyPlaying is
                 // called.
                 promise?.catch(() => {});
+
+                promises.push(promise);
+            }
+        }
+
+        // Make sure all the songs are synced.
+        for (const song of Object.values(this.curSongs)) {
+            if (song != null) {
+                song.currentTime = currentTime;
+            }
+        }
+        // And again
+        await Promise.all(promises);
+        // Make sure all the songs are synced.
+        for (const song of Object.values(this.curSongs)) {
+            if (song != null) {
+                song.currentTime = currentTime;
             }
         }
     }
