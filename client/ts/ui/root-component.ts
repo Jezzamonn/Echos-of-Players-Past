@@ -21,25 +21,7 @@ export class RootComponent extends LitElement {
             width: 100vw;
         }
 
-        player-picker {
-            position: absolute;
-            top: 70%;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            z-index: 1;
-        }
-
-        instructions-component {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            z-index: 1;
-        }
-
-        title-component {
+        .fullscreen {
             position: absolute;
             top: 0;
             left: 0;
@@ -69,10 +51,11 @@ export class RootComponent extends LitElement {
         let uiElems: TemplateResult[] = [];
 
         if (this.uiState === UIState.Title) {
-            uiElems.push(html`<title-component></title-component>`);
+            uiElems.push(html`<title-component class="fullscreen"></title-component>`);
         }
         if (this.uiState === UIState.Pick) {
             const picker = html`<player-picker
+                class="fullscreen"
                 levelName="${this.levelName}"
                 levelAttemptNumber="${this.levelAttemptNumber}"
                 @players-selected=${() => {
@@ -82,7 +65,7 @@ export class RootComponent extends LitElement {
             uiElems.push(picker);
         }
         if (this.uiState === UIState.Customizing) {
-            const customizer = html`<instructions-component></instructions-component>`;
+            const customizer = html`<instructions-component class="fullscreen"></instructions-component>`;
             uiElems.push(customizer);
         }
         return html`

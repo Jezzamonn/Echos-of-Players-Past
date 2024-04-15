@@ -10,23 +10,31 @@ import { choose } from '../../lib/util';
 @customElement('player-picker')
 export class PlayerPickerComponent extends LitElement {
     static styles = css`
-        .background {
-            background-color: rgba(0, 0, 0, 0.5);
+        :host {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
 
+        .background {
             position: absolute;
-            top: 30%;
+            background-color: rgba(0, 0, 0, 0.5);
+            top: 80%;
             left: 0;
             right: 0;
             bottom: 0;
         }
 
         .players {
+            position: absolute;
+            top: 70%;
+            left: 0;
+            right: 0;
+            bottom: 0;
             display: flex;
             justify-content: center;
             align-items: stretch;
             z-index: 1;
-            position: relative;
-            height: 100%;
         }
 
         .player-card-selected {
@@ -87,6 +95,7 @@ export class PlayerPickerComponent extends LitElement {
             ></summonable-player>`;
         });
         return html`
+            <h1>Summon a past player!</h1>
             <div class="players">${playerElements}</div>
             <div class="background"></div>
         `;
