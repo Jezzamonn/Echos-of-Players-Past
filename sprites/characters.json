@@ -936,7 +936,7 @@
     "duration": 500
    },
    {
-    "filename": "characters (HairPoofyBlind) 0.aseprite",
+    "filename": "characters (HairPoofyBlonde) 0.aseprite",
     "frame": { "x": 177, "y": 45, "w": 19, "h": 19 },
     "rotated": false,
     "trimmed": false,
@@ -945,7 +945,7 @@
     "duration": 5000
    },
    {
-    "filename": "characters (HairPoofyBlind) 1.aseprite",
+    "filename": "characters (HairPoofyBlonde) 1.aseprite",
     "frame": { "x": 177, "y": 45, "w": 19, "h": 19 },
     "rotated": false,
     "trimmed": false,
@@ -954,7 +954,7 @@
     "duration": 100
    },
    {
-    "filename": "characters (HairPoofyBlind) 2.aseprite",
+    "filename": "characters (HairPoofyBlonde) 2.aseprite",
     "frame": { "x": 177, "y": 45, "w": 19, "h": 19 },
     "rotated": false,
     "trimmed": false,
@@ -963,7 +963,7 @@
     "duration": 100
    },
    {
-    "filename": "characters (HairPoofyBlind) 3.aseprite",
+    "filename": "characters (HairPoofyBlonde) 3.aseprite",
     "frame": { "x": 199, "y": 1, "w": 19, "h": 19 },
     "rotated": false,
     "trimmed": false,
@@ -972,7 +972,7 @@
     "duration": 100
    },
    {
-    "filename": "characters (HairPoofyBlind) 4.aseprite",
+    "filename": "characters (HairPoofyBlonde) 4.aseprite",
     "frame": { "x": 1, "y": 1, "w": 19, "h": 19 },
     "rotated": false,
     "trimmed": false,
@@ -981,7 +981,7 @@
     "duration": 100
    },
    {
-    "filename": "characters (HairPoofyBlind) 5.aseprite",
+    "filename": "characters (HairPoofyBlonde) 5.aseprite",
     "frame": { "x": 1, "y": 1, "w": 19, "h": 19 },
     "rotated": false,
     "trimmed": false,
@@ -990,7 +990,7 @@
     "duration": 100
    },
    {
-    "filename": "characters (HairPoofyBlind) 6.aseprite",
+    "filename": "characters (HairPoofyBlonde) 6.aseprite",
     "frame": { "x": 1, "y": 1, "w": 19, "h": 19 },
     "rotated": false,
     "trimmed": false,
@@ -999,7 +999,7 @@
     "duration": 100
    },
    {
-    "filename": "characters (HairPoofyBlind) 7.aseprite",
+    "filename": "characters (HairPoofyBlonde) 7.aseprite",
     "frame": { "x": 1, "y": 1, "w": 19, "h": 19 },
     "rotated": false,
     "trimmed": false,
@@ -1008,7 +1008,7 @@
     "duration": 100
    },
    {
-    "filename": "characters (HairPoofyBlind) 8.aseprite",
+    "filename": "characters (HairPoofyBlonde) 8.aseprite",
     "frame": { "x": 1, "y": 1, "w": 19, "h": 19 },
     "rotated": false,
     "trimmed": false,
@@ -1017,7 +1017,7 @@
     "duration": 100
    },
    {
-    "filename": "characters (HairPoofyBlind) 9.aseprite",
+    "filename": "characters (HairPoofyBlonde) 9.aseprite",
     "frame": { "x": 1, "y": 1, "w": 19, "h": 19 },
     "rotated": false,
     "trimmed": false,
@@ -1026,7 +1026,7 @@
     "duration": 100
    },
    {
-    "filename": "characters (HairPoofyBlind) 10.aseprite",
+    "filename": "characters (HairPoofyBlonde) 10.aseprite",
     "frame": { "x": 1, "y": 1, "w": 19, "h": 19 },
     "rotated": false,
     "trimmed": false,
@@ -1035,7 +1035,7 @@
     "duration": 50
    },
    {
-    "filename": "characters (HairPoofyBlind) 11.aseprite",
+    "filename": "characters (HairPoofyBlonde) 11.aseprite",
     "frame": { "x": 1, "y": 1, "w": 19, "h": 19 },
     "rotated": false,
     "trimmed": false,
@@ -1044,7 +1044,7 @@
     "duration": 50
    },
    {
-    "filename": "characters (HairPoofyBlind) 12.aseprite",
+    "filename": "characters (HairPoofyBlonde) 12.aseprite",
     "frame": { "x": 1, "y": 1, "w": 19, "h": 19 },
     "rotated": false,
     "trimmed": false,
@@ -1287,7 +1287,7 @@
     "duration": 500
    },
    {
-    "filename": "characters (HairPointyBlond) 0.aseprite",
+    "filename": "characters (HairPointyBlonde) 0.aseprite",
     "frame": { "x": 221, "y": 45, "w": 19, "h": 19 },
     "rotated": false,
     "trimmed": false,
@@ -1296,7 +1296,7 @@
     "duration": 5000
    },
    {
-    "filename": "characters (HairPointyBlond) 1.aseprite",
+    "filename": "characters (HairPointyBlonde) 1.aseprite",
     "frame": { "x": 221, "y": 45, "w": 19, "h": 19 },
     "rotated": false,
     "trimmed": false,
@@ -1305,7 +1305,7 @@
     "duration": 100
    },
    {
-    "filename": "characters (HairPointyBlond) 2.aseprite",
+    "filename": "characters (HairPointyBlonde) 2.aseprite",
     "frame": { "x": 221, "y": 45, "w": 19, "h": 19 },
     "rotated": false,
     "trimmed": false,
@@ -1314,7 +1314,7 @@
     "duration": 100
    },
    {
-    "filename": "characters (HairPointyBlond) 3.aseprite",
+    "filename": "characters (HairPointyBlonde) 3.aseprite",
     "frame": { "x": 243, "y": 1, "w": 19, "h": 19 },
     "rotated": false,
     "trimmed": false,
@@ -1323,7 +1323,7 @@
     "duration": 100
    },
    {
-    "filename": "characters (HairPointyBlond) 4.aseprite",
+    "filename": "characters (HairPointyBlonde) 4.aseprite",
     "frame": { "x": 1, "y": 1, "w": 19, "h": 19 },
     "rotated": false,
     "trimmed": false,
@@ -1332,7 +1332,7 @@
     "duration": 100
    },
    {
-    "filename": "characters (HairPointyBlond) 5.aseprite",
+    "filename": "characters (HairPointyBlonde) 5.aseprite",
     "frame": { "x": 1, "y": 1, "w": 19, "h": 19 },
     "rotated": false,
     "trimmed": false,
@@ -1341,7 +1341,7 @@
     "duration": 100
    },
    {
-    "filename": "characters (HairPointyBlond) 6.aseprite",
+    "filename": "characters (HairPointyBlonde) 6.aseprite",
     "frame": { "x": 1, "y": 1, "w": 19, "h": 19 },
     "rotated": false,
     "trimmed": false,
@@ -1350,7 +1350,7 @@
     "duration": 100
    },
    {
-    "filename": "characters (HairPointyBlond) 7.aseprite",
+    "filename": "characters (HairPointyBlonde) 7.aseprite",
     "frame": { "x": 1, "y": 1, "w": 19, "h": 19 },
     "rotated": false,
     "trimmed": false,
@@ -1359,7 +1359,7 @@
     "duration": 100
    },
    {
-    "filename": "characters (HairPointyBlond) 8.aseprite",
+    "filename": "characters (HairPointyBlonde) 8.aseprite",
     "frame": { "x": 1, "y": 1, "w": 19, "h": 19 },
     "rotated": false,
     "trimmed": false,
@@ -1368,7 +1368,7 @@
     "duration": 100
    },
    {
-    "filename": "characters (HairPointyBlond) 9.aseprite",
+    "filename": "characters (HairPointyBlonde) 9.aseprite",
     "frame": { "x": 1, "y": 1, "w": 19, "h": 19 },
     "rotated": false,
     "trimmed": false,
@@ -1377,7 +1377,7 @@
     "duration": 100
    },
    {
-    "filename": "characters (HairPointyBlond) 10.aseprite",
+    "filename": "characters (HairPointyBlonde) 10.aseprite",
     "frame": { "x": 1, "y": 1, "w": 19, "h": 19 },
     "rotated": false,
     "trimmed": false,
@@ -1386,7 +1386,7 @@
     "duration": 50
    },
    {
-    "filename": "characters (HairPointyBlond) 11.aseprite",
+    "filename": "characters (HairPointyBlonde) 11.aseprite",
     "frame": { "x": 1, "y": 1, "w": 19, "h": 19 },
     "rotated": false,
     "trimmed": false,
@@ -1395,7 +1395,7 @@
     "duration": 50
    },
    {
-    "filename": "characters (HairPointyBlond) 12.aseprite",
+    "filename": "characters (HairPointyBlonde) 12.aseprite",
     "frame": { "x": 1, "y": 1, "w": 19, "h": 19 },
     "rotated": false,
     "trimmed": false,
@@ -1425,10 +1425,10 @@
    { "name": "HeadLight", "opacity": 255, "blendMode": "normal" },
    { "name": "HairPoofyBlack", "opacity": 255, "blendMode": "normal" },
    { "name": "HairPoofyBrown", "opacity": 255, "blendMode": "normal" },
-   { "name": "HairPoofyBlind", "opacity": 255, "blendMode": "normal" },
+   { "name": "HairPoofyBlonde", "opacity": 255, "blendMode": "normal" },
    { "name": "HairPointyBlack", "opacity": 255, "blendMode": "normal" },
    { "name": "HairPointyBrown", "opacity": 255, "blendMode": "normal" },
-   { "name": "HairPointyBlond", "opacity": 255, "blendMode": "normal" }
+   { "name": "HairPointyBlonde", "opacity": 255, "blendMode": "normal" }
   ]
  }
 }
