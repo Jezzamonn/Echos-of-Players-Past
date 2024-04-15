@@ -1,8 +1,11 @@
 import { LitElement, PropertyValues, css, html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { fetchSavedMoves } from '../../game/connection/server-connection';
+import { Game } from '../../game/game';
 import { LEVELS } from '../../game/levels';
 import { PlayerInfo } from '../../game/player-info';
+import { Sounds } from '../../lib/sounds';
+import { choose } from '../../lib/util';
 
 @customElement('player-picker')
 export class PlayerPickerComponent extends LitElement {
@@ -78,6 +81,8 @@ export class PlayerPickerComponent extends LitElement {
                         ];
                     }
                     this.maybeSendSelected();
+                    const mainPlayerSong = ((window as any).game as Game).playerVisualInfo?.songTrack ?? 'melody';
+                    Sounds.setSongs([mainPlayerSong, ...this.selectedPlayers.map(p => p.songTrack ?? 'melody')])
                 }}
             ></summonable-player>`;
         });
@@ -121,7 +126,18 @@ export class PlayerPickerComponent extends LitElement {
             }
             this.players = undefined;
             this.selectedPlayers = [];
-            this.players = await fetchSavedMoves(this.levelName);
+            const players = await fetchSavedMoves(this.levelName);
+
+            // Fill any players without a track with something random
+            const knownTracks = ['melody', 'bass', 'drums', 'chords'];
+            players.forEach((player) => {
+                if (!knownTracks.includes(player.songTrack ?? '')) {
+                    player.songTrack = choose(knownTracks, Math.random);
+                    console.log(`Chose random track for player ${player.player}: ${player.songTrack}`)
+                }
+            });
+
+            this.players = players;
 
             console.log(`Got players for level ${this.levelName}: ${this.players}`)
 

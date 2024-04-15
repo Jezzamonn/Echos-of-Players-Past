@@ -71,6 +71,7 @@ export class CharacterCustomizerComponent extends LitElement {
             hairStyle: this.hairStyle,
             skinTone: this.skinTone,
             clothing: this.clothing,
+            songTrack: this.track,
         };
         const nameValid = this.nameValid;
         return html`
