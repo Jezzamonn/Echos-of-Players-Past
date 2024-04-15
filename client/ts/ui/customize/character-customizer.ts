@@ -75,7 +75,7 @@ export class CharacterCustomizerComponent extends LitElement {
         };
         const nameValid = this.nameValid;
         return html`
-            <h1>Character Customizer</h1>
+            <h1>Character Creator</h1>
             <player-canvas .player=${playerInfo}></player-canvas>
             <div class="form">
                 <div class="form-row">

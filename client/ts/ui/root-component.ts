@@ -30,7 +30,7 @@ export class RootComponent extends LitElement {
             z-index: 1;
         }
 
-        character-customizer {
+        instructions-component {
             position: absolute;
             top: 0;
             left: 0;
@@ -82,7 +82,7 @@ export class RootComponent extends LitElement {
             uiElems.push(picker);
         }
         if (this.uiState === UIState.Customizing) {
-            const customizer = html`<character-customizer></character-customizer>`;
+            const customizer = html`<instructions-component></instructions-component>`;
             uiElems.push(customizer);
         }
         return html`

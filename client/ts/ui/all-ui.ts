@@ -1,4 +1,5 @@
 import './customize/character-customizer';
+import './instructions/instructions';
 import './loading-spinner';
 import './picker/player-picker';
 import './picker/summonable-player';
