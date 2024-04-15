@@ -1,5 +1,5 @@
 import { FacingDir, Point } from "../../common";
-import { ACTION_KEYS, DOWN_KEYS, FPS, LEFT_KEYS, PHYSICS_SCALE, RIGHT_KEYS, UP_KEYS, physFromPx } from "../../constants";
+import { DOWN_KEYS, FPS, LEFT_KEYS, PHYSICS_SCALE, RIGHT_KEYS, UP_KEYS, physFromPx } from "../../constants";
 import { Aseprite } from "../../lib/aseprite";
 import { RegularKeys } from "../../lib/keys";
 import { Level } from "../level";
@@ -20,6 +20,7 @@ export class Player extends Entity {
     keyRecorder: KeyRecorder | undefined;
     keys: RegularKeys;
     dead = false;
+    cheating = false;
 
     onFirstInput: (() => void) | undefined;
     visualInfo: PlayerVisualInfo;
@@ -87,7 +88,8 @@ export class Player extends Entity {
         const right = this.keys.anyIsPressed(RIGHT_KEYS);
         const up = this.keys.anyIsPressed(UP_KEYS);
         const down = this.keys.anyIsPressed(DOWN_KEYS);
-        const action = this.keys.anyIsPressed(ACTION_KEYS);
+        const action = false;// this.keys.anyIsPressed(ACTION_KEYS);
+        const invincible = this.cheating && this.keys.anyIsPressed(['KeyZ']);
 
         // TODO: Record this somehow.
         // Also TODO: Damping to make this smooth.
@@ -123,7 +125,9 @@ export class Player extends Entity {
 
         // Check for dying X_X
         if (this.isOnTile(this.level.tiles, PhysicTile.Hole) || this.isTouchingTile(this.level.tiles, PhysicTile.Death)) {
-            this.die();
+            if (!invincible) {
+                this.die();
+            }
         }
 
         this.keyRecorder?.update(this.keys);
