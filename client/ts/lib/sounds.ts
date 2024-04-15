@@ -98,6 +98,16 @@ class _Sounds {
 
     /** We still run the logic here when muted, so that we can update things when unmuted. */
     async setSongs(songNames: string[]) {
+        const songsSet = new Set(songNames);
+        if (!songsSet.has('drums')) {
+            songsSet.add('drums-small');
+        }
+        if (!songsSet.has('chords')) {
+            songsSet.add('chords-small');
+        }
+
+        songNames = [...songsSet];
+
         // First load all the songs
         await Promise.all(
             songNames.map((songName) => this.audios[songName].loadPromise).filter((p) => p != null)
@@ -112,6 +122,19 @@ class _Sounds {
             break;
         }
 
+        // Stop any song that shouldn't be playing no more
+        for (const songName of Object.keys(this.curSongs)) {
+            if (!songNames.includes(songName)) {
+                const song = this.curSongs[songName];
+                if (song != null) {
+                    song.pause();
+                    delete this.curSongs[songName];
+                }
+            }
+        }
+
+        console.log('Setting songs', songNames, currentTime);
+
         for (const songName of songNames) {
             const audioInfo = this.audios[songName];
             if (audioInfo == null) {
@@ -121,6 +144,8 @@ class _Sounds {
             const currentlyPlaying = this.curSongs[songName];
             if (currentlyPlaying != null) {
                 // Already playing this song.
+                // Make sure they're synced.
+                currentlyPlaying.currentTime = currentTime;
                 continue;
             }
 

@@ -35,7 +35,7 @@ async function init() {
         game.start();
     });
 
-    Sounds.setSongs(['drums-small', 'chords-small']);
+    Sounds.setSongs([]);
 }
 
 init();

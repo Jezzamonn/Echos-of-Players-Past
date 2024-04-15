@@ -1,6 +1,7 @@
 import { LitElement, css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { PlayerVisualInfo } from '../../game/player-info';
+import { Sounds } from '../../lib/sounds';
 import { choose } from '../../lib/util';
 
 @customElement('character-customizer')
@@ -27,13 +28,17 @@ export class CharacterCustomizerComponent extends LitElement {
         }
 
         .form-row {
-            margin: 0.5em 0;
+            margin: 16px 0;
         }
 
         .go-button {
             margin-top: 20px;
             padding: 10px 20px;
             font-size: 1.5em;
+        }
+
+        p {
+            margin: 4px 0;
         }
     `;
 
@@ -55,6 +60,9 @@ export class CharacterCustomizerComponent extends LitElement {
 
     @state()
     clothing = choose(['Blue', 'Green'], Math.random);
+
+    @state()
+    track: string = '';
 
     render() {
         const playerInfo: PlayerVisualInfo = {
@@ -143,10 +151,27 @@ export class CharacterCustomizerComponent extends LitElement {
                         <option value="Green" ?selected=${this.clothing === 'Green'}>Green</option>
                     </select>
                 </div>
+                <div class="form-row">
+                    <label for="track">Music Layer:&nbsp;</label>
+                    <select
+                        id="track"
+                        name="track"
+                        @change=${(e: Event) => {
+                            this.track = (e.target as HTMLSelectElement).value;
+                            Sounds.setSongs([this.track]);
+                        }}
+                    >
+                        <option value="" ?selected=${this.track === ''}>---</option>
+                        <option value="melody" ?selected=${this.track === 'melody'}>Melody</option>
+                        <option value="bass" ?selected=${this.track === 'bass'}>Bass</option>
+                        <option value="drums" ?selected=${this.track === 'drums'}>Drums</option>
+                        <option value="chords" ?selected=${this.track === 'chords'}>Chords</option>
+                    </select>
+                    <p>Other players will hear this layer when they summon you</p>
             </div>
             <button
                 class="go-button"
-                ?disabled=${!nameValid}
+                ?disabled=${!nameValid || this.track.length == 0}
                 @click=${() => {
                     this.dispatchEvent(
                         new CustomEvent('select-customization', {

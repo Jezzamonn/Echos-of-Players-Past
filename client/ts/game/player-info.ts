@@ -12,6 +12,7 @@ export interface PlayerInfo {
     hairStyle?: string;
     skinTone?: string;
     clothing?: string;
+    songTrack?: string;
 }
 
 export interface PlayerVisualInfo {
@@ -20,6 +21,7 @@ export interface PlayerVisualInfo {
     hairStyle?: string;
     skinTone?: string;
     clothing?: string;
+    songTrack?: string;
 }
 
 export function playerInfoToLayers(player: PlayerVisualInfo): string[] {
