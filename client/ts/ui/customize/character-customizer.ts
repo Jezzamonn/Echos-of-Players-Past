@@ -149,7 +149,7 @@ export class CharacterCustomizerComponent extends LitElement {
                 ?disabled=${!nameValid}
                 @click=${() => {
                     this.dispatchEvent(
-                        new CustomEvent('start-game', {
+                        new CustomEvent('select-customization', {
                             detail: playerInfo,
                             bubbles: true,
                             composed: true,
@@ -165,6 +165,6 @@ export class CharacterCustomizerComponent extends LitElement {
 
 declare global {
     interface HTMLElementEventMap {
-        'start-game': CustomEvent<PlayerVisualInfo>;
+        'select-customization': CustomEvent<PlayerVisualInfo>;
     }
 }

@@ -4,4 +4,5 @@ import './picker/player-picker';
 import './picker/summonable-player';
 import './player-canvas';
 import './root-component';
+import './title/title-component';
 

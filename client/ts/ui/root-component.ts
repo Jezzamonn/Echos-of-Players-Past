@@ -3,6 +3,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { Game } from '../game/game';
 
 export enum UIState {
+    Title = 'title',
     Customizing = 'customizing',
     Game = 'game',
     Pick = 'pick',
@@ -37,6 +38,15 @@ export class RootComponent extends LitElement {
             bottom: 0;
             z-index: 1;
         }
+
+        title-component {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 1;
+        }
     `;
 
     @property({ type: String })
@@ -46,7 +56,7 @@ export class RootComponent extends LitElement {
     accessor levelAttemptNumber: number | undefined = undefined;
 
     @state()
-    uiState: UIState = UIState.Customizing;
+    uiState: UIState = UIState.Title;
 
     willUpdate(changedProperties: PropertyValues<this>) {
         if (changedProperties.has('levelAttemptNumber')) {
@@ -58,6 +68,9 @@ export class RootComponent extends LitElement {
     render() {
         let uiElems: TemplateResult[] = [];
 
+        if (this.uiState === UIState.Title) {
+            uiElems.push(html`<title-component></title-component>`);
+        }
         if (this.uiState === UIState.Pick) {
             const picker = html`<player-picker
                 levelName="${this.levelName}"

@@ -2,7 +2,8 @@ import './ui/all-ui';
 
 import { Game } from "./game/game";
 import { PlayerInfo, PlayerVisualInfo } from './game/player-info';
-import { RootComponent } from './ui/root-component';
+import { Sounds } from './lib/sounds';
+import { RootComponent, UIState } from './ui/root-component';
 
 async function init() {
     await Game.preload()
@@ -24,11 +25,17 @@ async function init() {
         game.selectPlayers(event.detail);
     });
 
-    root.addEventListener('start-game', (event: CustomEvent<PlayerVisualInfo>) => {
+    root.addEventListener('hide-title', () => {
+        root.uiState = UIState.Customizing;
+    });
+
+    root.addEventListener('select-customization', (event: CustomEvent<PlayerVisualInfo>) => {
         console.log('start game')
         game.playerVisualInfo = event.detail;
         game.start();
     });
+
+    Sounds.setSongs(['drums-small', 'chords-small']);
 }
 
 init();

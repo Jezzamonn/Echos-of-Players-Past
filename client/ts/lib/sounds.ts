@@ -175,9 +175,9 @@ class _Sounds {
 
         // Quick thing to make local dev default to music off.
         if (storedMuteString == '' && window.location.href.includes('localhost')) {
-            console.log('Disabling music for local development');
-            this.muteState = MuteState.MUSIC_OFF;
-            return;
+            // console.log('Disabling music for local development');
+            // this.muteState = MuteState.MUSIC_OFF;
+            // return;
         }
 
         let muteState = parseInt(storedMuteString);

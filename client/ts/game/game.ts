@@ -280,8 +280,7 @@ export class Game {
             Sounds.loadSound({ name: 'drums', path: 'music/' }),
             Sounds.loadSound({ name: 'drums-small', path: 'music/' }),
         ]);
-        // Not awaited.
+        // Not awaitable.
         SFX.preload();
-        Sounds.setSongs(['drums', 'chords', 'bass', 'melody']);
     }
 }
